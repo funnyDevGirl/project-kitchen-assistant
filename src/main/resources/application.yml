@@ -1,0 +1,28 @@
+---
+
+spring:
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
+  output:
+    ansi:
+      enabled: always
+  instancio:
+    bean:
+      validation:
+        enabled: true
+  sql:
+    init:
+      mode: always
+  profiles:
+    default: development
+
+logging:
+  level:
+    root: INFO
+
+#api-key: "0b2ab6b48232380993de3417b192018c"
+#api-id: "7f2b3458"
