@@ -15,7 +15,7 @@ group = "io.project.kitchen_assistant"
 version = "0.0.1-SNAPSHOT"
 
 application {
-	mainClass.set("io.project.kitchen_assistant.AppApplication")
+	mainClass.set("io.project.kitchen_assistant.Application")
 }
 
 checkstyle {
@@ -52,13 +52,21 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
 
+	implementation("org.slf4j:slf4j-api:2.0.16")
+	implementation("ch.qos.logback:logback-classic:1.5.8")
+	implementation("ch.qos.logback:logback-core:1.5.8")
+
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.json:json:20231013")
+	implementation("org.commonmark:commonmark:0.18.2")
+	implementation("org.jsoup:jsoup:1.14.3")
 }
 
 
