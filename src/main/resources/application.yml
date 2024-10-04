@@ -1,5 +1,4 @@
 ---
-
 spring:
   jpa:
     generate-ddl: true
@@ -18,11 +17,26 @@ spring:
     init:
       mode: always
   profiles:
-    default: development
+    default: dev
 
 logging:
   level:
     root: INFO
 
-#api-key: "0b2ab6b48232380993de3417b192018c"
-#api-id: "7f2b3458"
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
+
+
+# данные для YandexGPT:
+FOLDER_ID: "b1g9e9k3q9k3fptu8ka4"
+# IAM_TOKEN запрашивать каждый в день
+IAM_TOKEN: "Bearer t1.9euelZqancfMko6VnpKSj4qXl8qXl-3rnpWanJvOkpOKj4nIipuMnMmcxprl8_clG39H-e99KBJJ_N3z92VJfEf5730oEkn8zef1656VmsaUi4yMnorPmMeSycqJz5qK7_zF656VmsaUi4yMnorPmMeSycqJz5qK.tfLOy-GU5wta0gAE8H4oQ3nBALmDsQ_Yfa2prAArJNJczSE4wBZi_n-xiCyt0gh_YQgY0yfZ_ZdLl1qfv-J5AA"
+api-url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+
+# данные для Todoist:
+CLIENT_ID: "a015f841860e44e38c3647bf458dfe3e"
+CLIENT_SECRET: "cfa10873f9a04e74a1e7115269590b1d"
+Verification token: "29495_a25fee2b77863c8b98a82d21"
+todoist-api-token: "Bearer 18268fda8108b8cc46448b631d3b3dcc08d52c24"
+
