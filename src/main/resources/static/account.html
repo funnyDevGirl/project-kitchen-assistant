@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Личный кабинет</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <!-- Навигационный блок -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light" id="navbar">
+    <a class="navbar-brand" href="/">Kitchen Assistant</a>
+    <div class="ml-auto">
+      <button id="logoutBtn" class="btn btn-outline-danger ml-2">Выйти</button>
+    </div>
+  </nav>
+
+
+<div class="container mt-5">
+  <h4 id="greeting">Привет, <span id="userFirstName"></span>!</h4>
+  <div class="mt-4">
+    <button id="viewRecipes" class="btn btn-outline-info ml-2">Избранные рецепты</button>
+    <button id="viewNotes" class="btn btn-outline-info ml-2">Заметки</button>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+
+    const token = localStorage.getItem('jwt-token');
+    const username = localStorage.getItem('username');
+
+    if (!token || !username) {
+        window.location.href = "/"; // Перенаправить на страницу входа
+        return;
+    }
+
+    // Заполняем имя пользователя из localStorage
+    $("#userFirstName").text(username);
+
+    // Обработка кликов на кнопках
+    $("#viewRecipes").on("click", function() {
+        window.location.href = "/favorites.html"; // Замените на ваш URL для рецептов
+    });
+
+    $("#viewNotes").on("click", function() {
+        // Здесь вы можете сделать переход на другую страницу с заметками
+        window.location.href = "/notes.html"; // Замените на ваш URL для заметок
+    });
+
+    // Обработка выхода
+    $("#logoutBtn").click(function() {
+        localStorage.removeItem('jwt-token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        window.location.href = '/'; // Переход на главную страницу
+    });
+  });
+</script>
+</body>
+</html>

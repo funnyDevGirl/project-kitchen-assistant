@@ -1,27 +1,32 @@
 package io.project.kitchen_assistant.config;
 
+import io.project.kitchen_assistant.interceptors.GptHeaderInterceptor;
+import io.project.kitchen_assistant.interceptors.GptTokenHeaderInterceptor;
+import lombok.AllArgsConstructor;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-
-// TODO: fix headers
 @Configuration
+@AllArgsConstructor
 public class RestTemplateConfig {
 
-//    @Bean
-//    public RestTemplate restTemplate(@Value("${FOLDER_ID}") String id,
-//                                     @Value("${IAM_TOKEN}") String token) {
-//        return new RestTemplateBuilder()
-//                .requestCustomizers(clientHttpRequest -> {
-//                    clientHttpRequest.getHeaders().add("x-folder-id", id);
-//                    clientHttpRequest.getHeaders().add("Authorization", token);
-//                })
-//                .build();
-//    }
+    private final AppConfig appConfig;
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public RestTemplate restTemplateForGpt(RestTemplateBuilder builder,
+                                           GptHeaderInterceptor gptHeaderInterceptor) {
+        return builder
+                .additionalInterceptors(gptHeaderInterceptor)
+                .build();
+    }
+
+    @Bean
+    public RestTemplate restTemplateForGptToken(RestTemplateBuilder builder,
+                                                GptTokenHeaderInterceptor gptTokenHeaderInterceptor) {
+        return builder
+                .additionalInterceptors(gptTokenHeaderInterceptor)
+                .build();
     }
 }

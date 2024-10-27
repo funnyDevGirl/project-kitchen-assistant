@@ -44,12 +44,15 @@ dependencies {
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
+	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
 
 	implementation("org.slf4j:slf4j-api:2.0.16")
@@ -67,10 +70,16 @@ dependencies {
 	implementation("org.json:json:20231013")
 	implementation("org.commonmark:commonmark:0.18.2")
 	implementation("org.jsoup:jsoup:1.14.3")
+
+	testImplementation ("org.testcontainers:testcontainers:1.20.1")
+	testImplementation("org.testcontainers:junit-jupiter:1.20.1")
+	testImplementation("org.testcontainers:postgresql:1.20.2")
+	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
 }
 
 
 tasks.withType<Test>() {
+	systemProperty("file.encoding", "utf-8")
 	finalizedBy(tasks.jacocoTestReport)
 	useJUnitPlatform()
 	testLogging {
@@ -78,6 +87,10 @@ tasks.withType<Test>() {
 		events = mutableSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
 		showStandardStreams = true
 	}
+}
+
+tasks.withType<JavaCompile> {
+	options.encoding = "UTF-8"
 }
 
 tasks.jacocoTestReport {

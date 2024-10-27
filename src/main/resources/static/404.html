@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страница не найдена</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<!-- Навигационный блок -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light" id="navbar">
+    <a class="navbar-brand" href="/">Kitchen Assistant</a>
+    <div class="ml-auto">
+        <button id="logoutBtn" class="btn btn-outline-danger ml-2">Выйти</button>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h1>404 - Страница не найдена! :(</h1>
+    <p>К сожалению, запрашиваемая страница не существует.</p>
+    <a href="/" class="btn btn-primary">Перейти на страницу поиска</a>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Обработка выхода
+        $("#logoutBtn").click(function() {
+            localStorage.removeItem('jwt-token');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+
+            $("#navbar").hide(); // Скрыть навигационный блок
+            $("#loginContainer").show(); // Показать форму логина
+            $("#searchContainer").hide(); // Скрыть строку поиска
+            $("#results").hide(); // Скрыть результаты поиска
+            window.location.href = '/'; // Переход на главную страницу
+        });
+    });
+</script>
+</body>
+</html>

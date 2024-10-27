@@ -1,32 +1,30 @@
 package io.project.kitchen_assistant.component;
 
-import io.project.kitchen_assistant.repository.UserRepository;
-import io.project.kitchen_assistant.service.RecipeService;
+import io.project.kitchen_assistant.dto.users.UserCreateDTO;
 import io.project.kitchen_assistant.service.UserService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-
+@Slf4j
 @Component
 @AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
-    private UserRepository userRepository;
     private final UserService userService;
-    private final RecipeService recipeService;
-    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
+    private TokenScheduler tokenScheduler;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-//        var admin = new UserCreateDTO();
-//        admin.setEmail("hexlet@example.com");
-//        admin.setFirstName("Admin");
-//        admin.setLastName("Admin");
-//        admin.setPassword("qwerty");
-//        userService.create(admin);
+        tokenScheduler.fetchNewAccessToken();
+
+        var admin = new UserCreateDTO();
+        admin.setEmail("email@example.com");
+        admin.setFirstName("Admin");
+        admin.setLastName("Admin");
+        admin.setPassword("qwerty");
+        userService.create(admin);
     }
 }

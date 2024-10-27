@@ -17,10 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-
 
 @Configuration
 @EnableWebSecurity
@@ -30,15 +26,6 @@ public class SecurityConfig {
     private final JwtDecoder jwtDecoder;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
-
-    public static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
-            //new AntPathRequestMatcher("/api/v1/login/**"),
-            //new AntPathRequestMatcher("/api/v1/login"),
-            new AntPathRequestMatcher("/api/v1/**"),
-            new AntPathRequestMatcher("/*"),
-            new AntPathRequestMatcher("/index.html")
-            //new AntPathRequestMatcher("/exception")
-    );
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -51,8 +38,9 @@ public class SecurityConfig {
                 .headers(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
-                //        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/**").permitAll()
+                        .requestMatchers("/api/v1/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                         .anyRequest().authenticated())
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
