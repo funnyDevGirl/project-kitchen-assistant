@@ -32,7 +32,7 @@ public class TokenScheduler {
 
         if (token != null) {
             appConfig.setIAmToken(token);
-            log.info("Token updated: '{}'", token);
+            log.debug("Token updated: '{}'", token); //убрать вообще
         } else {
             log.error("Failed to update token.");
         }
@@ -50,7 +50,7 @@ public class TokenScheduler {
             if (response.getBody() != null) {
                 token = response.getBody().getIamToken();
             } else {
-                return "Token invalid.";
+                return null;
             }
 
         } catch (HttpClientErrorException e) {

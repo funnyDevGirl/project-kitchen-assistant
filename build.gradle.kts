@@ -69,12 +69,17 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.json:json:20231013")
 	implementation("org.commonmark:commonmark:0.18.2")
-	implementation("org.jsoup:jsoup:1.14.3")
+	implementation("org.jsoup:jsoup:1.15.3")
 
 	testImplementation ("org.testcontainers:testcontainers:1.20.1")
 	testImplementation("org.testcontainers:junit-jupiter:1.20.1")
 	testImplementation("org.testcontainers:postgresql:1.20.2")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
+	testImplementation("org.mockito:mockito-core:5.5.0")
+//	testImplementation("org.springframework:spring-mock:2.0.8")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0")
+	implementation("javax.validation:validation-api:1.0.0.GA")
+
 }
 
 

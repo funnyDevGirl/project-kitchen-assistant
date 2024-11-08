@@ -14,7 +14,7 @@ import java.io.IOException;
 @Slf4j
 @AllArgsConstructor
 @Component
-public class GptHeaderInterceptor implements ClientHttpRequestInterceptor {
+public class TodoistHeaderForPostInterceptor implements ClientHttpRequestInterceptor {
 
     private final AppConfig appConfig;
 
@@ -23,10 +23,11 @@ public class GptHeaderInterceptor implements ClientHttpRequestInterceptor {
                                         ClientHttpRequestExecution execution) throws IOException {
 
         request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        request.getHeaders().set("x-folder-id", appConfig.getFolderId());
-        request.getHeaders().set("Authorization", appConfig.getIAmToken());
+        request.getHeaders().set("X-Request-Id", appConfig.getTodoistRequestId());
+        request.getHeaders().set("Authorization", appConfig.getTodoistApiToken());
 
-        log.info("Sending request to URI: {}", request.getURI());
+        log.info("Sending POST request to URI: {}", request.getURI());
+        log.info("Outgoing request headers: {}", request.getHeaders());
 
         return execution.execute(request, body);
     }

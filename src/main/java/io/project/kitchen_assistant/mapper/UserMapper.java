@@ -9,8 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Mapper(
-        uses = {ReferenceMapper.class},
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
@@ -21,7 +19,7 @@ public abstract class UserMapper {
 
     @BeforeMapping
     public void encryptPassword(UserCreateDTO userCreateDTO) {
-        var password = userCreateDTO.getPassword();
+        String password = userCreateDTO.getPassword();
         userCreateDTO.setPassword(passwordEncoder.encode(password));
     }
 

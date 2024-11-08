@@ -4,6 +4,8 @@ import io.project.kitchen_assistant.dto.users.UserCreateDTO;
 import io.project.kitchen_assistant.dto.users.UserDTO;
 
 public interface UserService {
+
     UserDTO create(UserCreateDTO userCreateDTO);
+
     UserDTO findByEmail(String email);
 }

@@ -38,4 +38,10 @@ gpt-token-url: "https://iam.api.cloud.yandex.net/iam/v1/tokens"
 FOLDER_ID: "b1g9e9k3q9k3fptu8ka4"
 gpt-api-url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
+# данные для Todoist:
+request-id: "29495_a25fee2b77863c8b98a82d21"
+todoist-api-token: "Bearer 18268fda8108b8cc46448b631d3b3dcc08d52c24"
+todoist-labels-api-url: "https://api.todoist.com/rest/v2/labels"
+todoist-tasks-api-url: "https://api.todoist.com/rest/v2/tasks"
+
 
