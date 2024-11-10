@@ -5,20 +5,21 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 @SpringBootTest
-public class JacksonLocalDateTimeTest {
+public class JacksonConfigTest {
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    public void test() throws IOException {
+    public void test() {
 
-        final String json = "{ \"created_at\": \"2024-11-02T11:33:17.666272Z\" }";
-        final JsonType instance = objectMapper.readValue(json, JsonType.class);
+        Map<String, String> jsonMap = Map.of("created_at", "2024-11-02T11:33:17.666272Z");
+
+        JsonType instance = objectMapper.convertValue(jsonMap, JsonType.class);
 
         OffsetDateTime expectedDate = OffsetDateTime.parse("2024-11-02T11:33:17.666272Z");
         Assertions.assertEquals(expectedDate, instance.getDate());

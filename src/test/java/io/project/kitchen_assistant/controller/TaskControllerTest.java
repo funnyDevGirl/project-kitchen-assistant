@@ -71,8 +71,8 @@ public class TaskControllerTest {
                 .build();
 
         try {
-            String fixtureForRequest1 = FileReader.readFixture("test-request-get-1.json");
-            String fixtureForRequest2 = FileReader.readFixture("test-request-get-2.json");
+            String fixtureForRequest1 = FileReader.readFixture("test-request-1.json");
+            String fixtureForRequest2 = FileReader.readFixture("test-request-2.json");
 
             taskRequest = om.readValue(fixtureForRequest1, TodoistTaskRequest.class);
             log.info("TaskRequest: '{}'", taskRequest);

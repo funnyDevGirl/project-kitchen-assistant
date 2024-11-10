@@ -1,14 +1,11 @@
 package io.project.kitchen_assistant.dto.todoist.tasks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.project.kitchen_assistant.dto.todoist.tasks.response.Due;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -31,7 +28,6 @@ public class TodoistTaskRequest {
 
     private List<String> labels;
 
-//    private Due due;
     @JsonProperty("due_date")
     private String dueDate;
 

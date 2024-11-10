@@ -2,7 +2,6 @@ package io.project.kitchen_assistant.mapper;
 
 import io.project.kitchen_assistant.dto.todoist.tasks.TaskDTO;
 import io.project.kitchen_assistant.dto.todoist.tasks.TodoistTaskResponse;
-import io.project.kitchen_assistant.dto.todoist.tasks.response.Due;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;

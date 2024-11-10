@@ -10,6 +10,10 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Класс для получения задачи из Todoist.
+ * Содержит только основную информацию о задаче, поля с null игнорируются.
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,7 +32,7 @@ public class TodoistTaskResponse {
     @JsonProperty("is_completed")
     private Boolean isCompleted;
 
-    @JsonProperty(value = "labels", defaultValue = "[ \"Важно\", \"Покупки\" ]")
+    @JsonProperty(value = "labels")
     private List<String> labels;
 
     private Integer priority;

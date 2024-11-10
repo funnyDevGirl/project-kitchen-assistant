@@ -30,25 +30,19 @@ public class TaskServiceImpl implements TaskService {
 
     private final AppConfig appConfig;
     private final TaskMapper taskMapper;
-    private final RestTemplate restTemplateTodoistApiForPost;
-    private final RestTemplate restTemplateTodoistApiForGetAndDelete;
+    private final RestTemplate restTemplateTodoistApi;
 
     public TaskServiceImpl(AppConfig appConfig, TaskMapper taskMapper,
-                           @Qualifier("restTemplateForPostToTodoist") RestTemplate restTemplateTodoistApiForPost,
-                           @Qualifier("restTemplateForGetAndDeleteOnTodoist") RestTemplate restTemplateTodoistApiForGetAndDelete) {
+                           @Qualifier("restTemplateForTodoist") RestTemplate restTemplateTodoistApi) {
         this.appConfig = appConfig;
         this.taskMapper = taskMapper;
-        this.restTemplateTodoistApiForPost = restTemplateTodoistApiForPost;
-        this.restTemplateTodoistApiForGetAndDelete = restTemplateTodoistApiForGetAndDelete;
+        this.restTemplateTodoistApi = restTemplateTodoistApi;
     }
 
     public TaskDTO create(TodoistTaskRequest taskRequest) {
         addDefaultLabels(taskRequest);
         ResponseEntity<TodoistTaskResponse> responseEntity = exchangeForPost(taskRequest);
 
-//        if (responseEntity == null) {
-//            throw new IllegalArgumentException("Response entity is null.");
-//        }
         return Optional.ofNullable(responseEntity.getBody())
                 .map(taskMapper::toDTO)
                 .map(task -> {
@@ -63,7 +57,7 @@ public class TaskServiceImpl implements TaskService {
 
     private ResponseEntity<TodoistTaskResponse> exchangeForPost(TodoistTaskRequest taskRequest) {
         try {
-            return restTemplateTodoistApiForPost.exchange(
+            return restTemplateTodoistApi.exchange(
                     appConfig.getTodoistTasksApiUrl(),
                     HttpMethod.POST,
                     new HttpEntity<>(taskRequest),
@@ -84,9 +78,6 @@ public class TaskServiceImpl implements TaskService {
         String url = format("%s/%s", appConfig.getTodoistTasksApiUrl(), id);
         ResponseEntity<TodoistTaskResponse> response = exchangeForGet(id, url);
 
-        if (response == null) {
-            throw new IllegalArgumentException("Response entity is null.");
-        }
         return Optional.ofNullable(response.getBody())
                 .map(taskMapper::toDTO)
                 .orElseThrow(() -> new IllegalArgumentException("Task response must not be null"));
@@ -94,19 +85,17 @@ public class TaskServiceImpl implements TaskService {
 
     private ResponseEntity<TodoistTaskResponse> exchangeForGet(String id, String url) {
         try {
-            return restTemplateTodoistApiForGetAndDelete.exchange(url, HttpMethod.GET,null, TodoistTaskResponse.class);
+            return restTemplateTodoistApi.exchange(url, HttpMethod.GET,null, TodoistTaskResponse.class);
 
         } catch (HttpClientErrorException e) {
-//            if (e.getStatusCode().value() == (HttpStatus.NOT_FOUND.value())) {
+
             if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
                 throw new TaskNotFoundException(String.format("Task with ID %s not found.", id));
 
             } else if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-                throw new IllegalArgumentException("Invalid task ID provided: " + id);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task ID provided: " + id);
             }
             throw new RuntimeException(String.format("Error while retrieving task: %s. %s", e.getMessage(), e));
-//            log.error("HTTP error occurred while receiving task: {}", e.getMessage(), e);
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error during API call", e);
 
         } catch (Exception e) {
             throw new RuntimeException(String.format("Unexpected error occurred while receiving task: %s. %s", e.getMessage(), e));
@@ -131,7 +120,7 @@ public class TaskServiceImpl implements TaskService {
 
     private ResponseEntity<TodoistTaskResponse[]> exchangeForGetAll() {
         try {
-            return restTemplateTodoistApiForGetAndDelete.exchange(
+            return restTemplateTodoistApi.exchange(
                     appConfig.getTodoistTasksApiUrl(),
                     HttpMethod.GET,
                     null,
@@ -161,7 +150,7 @@ public class TaskServiceImpl implements TaskService {
 
     private ResponseEntity<Void> exchangeForDelete(String id, String url) {
         try {
-            return restTemplateTodoistApiForGetAndDelete.exchange(url, HttpMethod.DELETE, null, Void.class);
+            return restTemplateTodoistApi.exchange(url, HttpMethod.DELETE, null, Void.class);
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             log.error("HTTP error occurred while deleting task: {}", e.getMessage(), e);
