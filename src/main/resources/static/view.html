@@ -23,8 +23,46 @@
         <p id="recipeIngredients">Ингредиенты</p>
         <p id="recipeInstructions">Инструкции</p>
         <button id="favoritesBtn" class="btn btn-outline-info ml-2">Назад к рецептам</button>
+
+
+        <button id="createShoppingListBtn" class="btn btn-success ml-2">Сформировать список покупок</button>
+
+
     </div>
 </div>
+
+
+<div id="taskForm" style="display:none;">
+    <h4>Создание задачи</h4>
+    <form id="createTask">
+        <div class="form-group">
+            <label for="taskContent">Список ингредиентов:</label>
+            <textarea class="form-control" id="taskContent" rows="3" readonly></textarea>
+        </div>
+        <div class="form-group">
+            <label for="taskDescription">Описание:</label>
+            <input type="text" class="form-control" id="taskDescription" required>
+        </div>
+        <div class="form-group">
+            <label for="taskLabels">Метки:</label>
+            <select multiple class="form-control" id="taskLabels">
+                <option value="Food">Food</option>
+                <option value="Shopping">Shopping</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="taskDueDate">Дата выполнения:</label>
+            <input type="date" class="form-control" id="taskDueDate">
+        </div>
+        <div class="form-group">
+            <label for="taskDueString">Дополнительная информация:</label>
+            <input type="text" class="form-control" id="taskDueString">
+        </div>
+        <button type="submit" class="btn btn-primary">Создать задачу</button>
+        <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button>
+    </form>
+</div>
+
 
 <script>
     $(document).ready(function() {
@@ -63,6 +101,58 @@
         $("#searchRecipesBtn").click(function() {
             window.location.href = '/'; // Редирект на главную страницу
         });
+
+
+
+
+        $("#createShoppingListBtn").click(function() {
+
+            // Заполняем список ингредиентов из выбранных рецептов
+            let ingredientsList = recipes.map(recipe => recipe.ingredients).join(", ");
+
+            $("#taskContent").val(ingredientsList);
+
+            // Показываем форму
+            $("#taskForm").show();
+        });
+
+        // Обработка отправки формы
+        $("#createTask").submit(function(event) {
+            event.preventDefault();
+
+            const taskRequest = {
+                content: $("#taskContent").val(),
+                description: $("#taskDescription").val(),
+                labels: Array.from($("#taskLabels").val()),
+                dueDate: $("#taskDueDate").val(),
+                dueString: $("#taskDueString").val()
+            };
+
+            $.ajax({
+                url: '/api/v1/tasks',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(taskRequest),
+                success: function(response) {
+                    alert("Задача успешно создана!");
+                    $("#taskForm").hide(); // Скрываем форму
+                    $("#taskForm")[0].reset(); // Сбрасываем форму
+                },
+                error: function(xhr, status, error) {
+                    console.error("Ошибка при создании задачи: " + error);
+                    alert("Произошла ошибка при создании задачи.");
+                }
+            });
+        });
+
+        // Обработка кнопки отмены
+        $("#cancelBtn").click(function() {
+            $("#taskForm").hide();
+        });
+
+
+
+
 
         // Обработка выхода
         $("#logoutBtn").click(function() {

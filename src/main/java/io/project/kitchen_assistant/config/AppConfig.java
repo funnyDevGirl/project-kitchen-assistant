@@ -24,16 +24,27 @@ public class AppConfig {
     @Setter
     private String iAmToken;
 
-    @Value("${request-id}")
-    private String todoistRequestId;
-
-    @Value("${todoist-api-token}")
+    @Setter
     private String todoistApiToken;
-
-    @Value("${todoist-labels-api-url}")
-    private String todoistLabelsApiUrl;
 
     @Value("${todoist-tasks-api-url}")
     private String todoistTasksApiUrl;
 
+    @Value("${spring.security.oauth2.client.registration.todoist.client-id}")
+    private String todoistClientId;
+
+    @Value("${spring.security.oauth2.client.registration.todoist.client-secret}")
+    private String todoistClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.todoist.scope}")
+    private String todoistScope;
+
+    @Value("${spring.security.oauth2.client.provider.todoist.authorization-uri}")
+    private String todoistAuthorizationUri;
+
+    @Value("${spring.security.oauth2.client.registration.todoist.redirect-uri}")
+    private String todoistAuthRedirectUri;
+
+    @Value("${spring.security.oauth2.client.provider.todoist.token-uri}")
+    private String exchangeTodoistTokenUrl;
 }

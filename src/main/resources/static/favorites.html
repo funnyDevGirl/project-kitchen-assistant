@@ -6,6 +6,17 @@
     <title>Избранные рецепты</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        .recipe-item { cursor: pointer; transition: border 0.2s; }
+        .recipe-item.selected {
+            border: 2px solid #007bff; /* Цвет рамки при выделении */
+            background-color: rgba(0, 123, 255, 0.1); /* Цвет фона при выделении */
+        }
+        #createShoppingListBtn {
+            display: none; /* Изначально скрыта */
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -22,8 +33,43 @@
 
 <div class="container mt-5">
     <h3>Избранные рецепты</h3>
+
+    <p><button id="createShoppingListBtn" class="btn btn-success mt-3">Сформировать список покупок в Todoist</button></p>
+
     <div id="results"></div>
+
+    <div id="taskForm" style="display:none;">
+        <h4>Создание задачи</h4>
+        <form id="createTask">
+            <div class="form-group">
+                <label for="taskContent">Список ингредиентов:</label>
+                <textarea class="form-control" id="taskContent" rows="3" readonly></textarea>
+            </div>
+            <div class="form-group">
+                <label for="taskDescription">Описание:</label>
+                <input type="text" class="form-control" id="taskDescription" required>
+            </div>
+            <div class="form-group">
+                <label for="taskLabels">Метки:</label>
+                <select multiple class="form-control" id="taskLabels">
+                    <option value="Food" selected>Food</option>
+                    <option value="Shopping" selected>Shopping</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="taskDueDate">Дата выполнения:</label>
+                <input type="date" class="form-control" id="taskDueDate">
+            </div>
+            <div class="form-group">
+                <label for="taskDueString">Дополнительная информация:</label>
+                <input type="text" class="form-control" id="taskDueString">
+            </div>
+            <button type="submit" class="btn btn-primary">Создать задачу</button>
+            <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button>
+        </form>
+    </div>
 </div>
+
 
 <script>
     $(document).ready(function() {
@@ -43,12 +89,13 @@
                 if (recipes.length > 0) {
                     recipes.forEach(function(recipe) {
                         let recipeHtml = `
-                        <div class="card mb-4 recipe-item">
+                        <div class="card mb-4 recipe-item" data-recipe='${JSON.stringify(recipe)}'> <!-- Добавлено data-recipe -->
                             <div class="card-body">
                                 <h4 class="card-title">${recipe.name}</h4>
                                 <p class="card-text"><strong>Ингредиенты:</strong> ${recipe.ingredients}</p>
                                 <p class="card-text"><strong>Приготовление:</strong> ${recipe.instructions}</p>
-                                <a href="/view.html?id=${recipe.id}" class="btn btn-info">Посмотреть рецепт</a> <!-- Кнопка для просмотра рецепта -->
+
+                                <a href="/view.html?id=${recipe.id}" class="btn btn-info">Посмотреть рецепт</a>
 
                             </div>
                         </div>
@@ -80,6 +127,97 @@
             $("#loginContainer").show(); // Показать форму логина
             $("#searchContainer").hide(); // Скрыть строку поиска
             window.location.href = '/'; // Переход на главную страницу
+        });
+
+
+        // Выбор рецептов через клик
+        $(document).on('click', '.recipe-item', function() {
+            $(this).toggleClass('selected');
+
+            // Проверяем, есть ли выделенные рецепты
+            const selectedRecipesCount = $(".recipe-item.selected").length;
+            console.log(`Количество выделенных рецептов: ${selectedRecipesCount}`);
+
+            // Показываем кнопку "Сформировать список покупок" только если есть выделенные рецепты
+            if (selectedRecipesCount > 0) {
+                $("#createShoppingListBtn").show();
+            } else {
+                $("#createShoppingListBtn").hide();
+            }
+        });
+
+        $("#createShoppingListBtn").click(function() {
+            const selectedRecipes = $(".recipe-item.selected");
+
+            console.log(selectedRecipes.length); // Выводим количество выделенных рецептов
+            // Если нет выделенных рецептов
+            if (selectedRecipes.length === 0) {
+                alert("Пожалуйста, выберите хотя бы один рецепт."); // Показываем алерт
+                return; // Выходим, если нет выделенных рецептов
+            }
+
+            let ingredientsList = "";
+
+            selectedRecipes.each(function() {
+                const recipe = $(this).data('recipe');
+
+                // Выводим информацию о текущем элементе
+                console.log("Current element:", $(this)); // Выводим элемент
+                console.log("Recipe data:", recipe); // Выводим рецепт
+
+                // Выводим рецепт в консоль
+                console.log(recipe); // Печать объекта рецепта в консоли
+
+                // Добавьте проверку на существование рецепта и его ингредиентов
+                if (recipe && recipe.ingredients) {
+                    ingredientsList += `${recipe.ingredients}, `;
+                } else {
+                    console.warn("Recipe or ingredients are not defined", recipe);
+                }
+
+            });
+
+            if (ingredientsList) {
+                ingredientsList = ingredientsList.slice(0, -2);
+                $("#taskContent").val(ingredientsList);
+                $("#taskForm").show();
+            } else {
+                alert("Пожалуйста, выберите хотя бы один рецепт.");
+            }
+        });
+
+        $("#createTask").submit(function(event) {
+            event.preventDefault();
+
+            const taskRequest = {
+                content: $("#taskContent").val(),
+                description: $("#taskDescription").val(),
+                labels: Array.from($("#taskLabels").val()),
+                dueDate: $("#taskDueDate").val(),
+                dueString: $("#taskDueString").val()
+            };
+
+            $.ajax({
+                url: '/api/v1/tasks',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(taskRequest),
+                success: function(response) {
+                    alert("Задача успешно создана!");
+                    $("#taskForm").hide();
+                    $("#taskForm")[0].reset();
+                    $("#createShoppingListBtn").hide(); // Скрыть кнопку после создания задачи
+                    $(".recipe-item").removeClass('selected'); // Снять выделение с рецептов
+                },
+                error: function(xhr, status, error) {
+                    console.error("Ошибка при создании задачи: " + error);
+                    alert("Произошла ошибка при создании задачи.");
+                }
+            });
+        });
+
+        $("#cancelBtn").click(function() {
+            $("#taskForm").hide();
         });
     });
 </script>

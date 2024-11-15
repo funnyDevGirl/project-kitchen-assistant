@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
 import java.io.IOException;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -25,7 +26,7 @@ public class TodoistHeaderInterceptor implements ClientHttpRequestInterceptor {
 
         if (request.getMethod().equals(HttpMethod.POST)) {
             request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            request.getHeaders().set("X-Request-Id", appConfig.getTodoistRequestId());
+            request.getHeaders().set("X-Request-Id", UUID.randomUUID().toString());
             request.getHeaders().set("Authorization", appConfig.getTodoistApiToken());
 
             log.info("Sending POST request to URI: {}", request.getURI());

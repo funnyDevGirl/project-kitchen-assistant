@@ -11,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 @AllArgsConstructor
 public class RestTemplateConfig {
 
-    private final AppConfig appConfig;
 
     @Bean
     public RestTemplate restTemplateForGpt(RestTemplateBuilder builder,
@@ -35,6 +34,14 @@ public class RestTemplateConfig {
                                                TodoistHeaderInterceptor todoistHeaderInterceptor) {
         return builder
                 .additionalInterceptors(todoistHeaderInterceptor)
+                .build();
+    }
+
+    @Bean
+    public RestTemplate restTemplateForGetTodoistToken(RestTemplateBuilder builder,
+                                                       TodoistTokenExchangeInterceptor todoistTokenExchangeInterceptor) {
+        return builder
+                .additionalInterceptors(todoistTokenExchangeInterceptor)
                 .build();
     }
 }

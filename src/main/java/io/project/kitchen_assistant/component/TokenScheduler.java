@@ -2,6 +2,7 @@ package io.project.kitchen_assistant.component;
 
 import io.project.kitchen_assistant.config.AppConfig;
 import io.project.kitchen_assistant.dto.recipes.gpt.TokenResponse;
+import io.project.kitchen_assistant.config.ApplicationConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -12,6 +13,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import static java.lang.String.format;
 
 @Slf4j
 @EnableScheduling
@@ -26,13 +29,13 @@ public class TokenScheduler {
         this.restTemplateGptTokenApi = restTemplateGptTokenApi;
     }
 
-    @Scheduled(fixedRate = 10800000)
+    @Scheduled(fixedRate = ApplicationConstants.TOKEN_REFRESH_RATE)
     public void scheduleFetchNewAccessToken() {
         String token = fetchNewAccessToken();
 
         if (token != null) {
             appConfig.setIAmToken(token);
-            log.debug("Token updated: '{}'", token); //убрать вообще
+            log.info("Token updated");
         } else {
             log.error("Failed to update token.");
         }
@@ -58,6 +61,6 @@ public class TokenScheduler {
         }
         log.info("Getting the access token successfully");
 
-        return "Bearer " + token;
+        return format("Bearer %s", token);
     }
 }
