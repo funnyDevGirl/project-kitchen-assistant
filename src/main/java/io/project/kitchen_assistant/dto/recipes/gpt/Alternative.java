@@ -8,7 +8,6 @@ import lombok.Data;
  */
 @Data
 public class Alternative {
-    @JsonProperty("message")
     private Message message;
     private String status;
 }

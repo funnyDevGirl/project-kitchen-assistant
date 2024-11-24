@@ -53,15 +53,15 @@ logging:
     root: INFO
 
 rsa:
-  private-key: classpath:certs/private.pem  # спрятать, реализовать получение ключей от клиента
-  public-key: classpath:certs/public.pem # спрятать, реализовать получение ключей от клиента
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
 
 # получение token для запросов к YandexGPT:
 JWT_TOKEN: "{\"yandexPassportOauthToken\":\"y0_AgAAAAB4pbvzAATuwQAAAAERiQoLAAAJDwu7zrdIMoZCxO3EGvZ8HE3S_A\"}"
 gpt-token-url: "https://iam.api.cloud.yandex.net/iam/v1/tokens"
 
 # данные для YandexGPT:
-FOLDER_ID: "b1g9e9k3q9k3fptu8ka4" # спрятать
+FOLDER_ID: "b1g9e9k3q9k3fptu8ka4"
 gpt-api-url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
 # данные для создания задач в Todoist:
@@ -71,6 +71,9 @@ todoist-tasks-api-url: "https://api.todoist.com/rest/v2/tasks"
 # данные для авторизации в Todoist:
 #todoist-redirect-uri: "https://localhost:8080/api/v1/auth/callback" # http://localhost:8080/login/oauth2/code/todoist
 
-
+test-email: "email@example.com"
+test-first-name: "Admin"
+test-last-name: "Admin"
+test-pass: "qwerty"
 
 

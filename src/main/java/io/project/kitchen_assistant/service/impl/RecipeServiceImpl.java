@@ -22,10 +22,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
-
 import static io.project.kitchen_assistant.utils.FileReader.readResourceFile;
+import static java.lang.String.format;
 
 @Slf4j
 @Service
@@ -53,12 +52,13 @@ public class RecipeServiceImpl implements RecipeService {
         Recipe recipe = recipeMapper.map(recipeCreateDTO);
 
         User currentUser = userRepository.findByEmail(userEmail).orElseThrow(
-                () -> new UsernameNotFoundException(String.format("User with email '%s' is not logged in or does not exist", userEmail)));
+                () -> new UsernameNotFoundException(format("User with email '%s' is not logged in or does not exist", userEmail)));
 
         recipe.setUser(currentUser);
         recipeRepository.save(recipe);
 
-        return recipeMapper.map(recipe);
+        Recipe savedRecipe = recipeRepository.findByName(recipe.getName()).orElseThrow();
+        return recipeMapper.map(savedRecipe);
     }
 
     public List<RecipeDTO> getAllRecipesByUserEmail(String email) {
@@ -72,7 +72,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     public RecipeDTO findById(long id) {
         var recipe = recipeRepository.findById(id)
-                .orElseThrow(() -> new RecipeNotFoundException(String.format("Recipe with id: '%s' not found", id)));
+                .orElseThrow(() -> new RecipeNotFoundException(format("Recipe with id: '%s' not found", id)));
 
         return recipeMapper.map(recipe);
     }

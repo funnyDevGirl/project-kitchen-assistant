@@ -29,7 +29,9 @@ public class RecipeController {
     @ResponseStatus(HttpStatus.CREATED)
     public RecipeDTO create(@Valid @RequestBody RecipeCreateDTO recipeCreateDTO,
                             Authentication authentication) {
-
+        if (authentication == null) {
+            throw new IllegalArgumentException("Authentication is required");
+        }
         String email = authentication.getName();
         return recipeService.create(recipeCreateDTO, email);
     }
@@ -37,6 +39,9 @@ public class RecipeController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<RecipeDTO>> getFavoriteRecipes(Authentication authentication) {
+        if (authentication == null) {
+            throw new IllegalArgumentException("Authentication is required");
+        }
 
         List<RecipeDTO> recipes = recipeService.getAllRecipesByUserEmail(authentication.getName());
         return ResponseEntity
@@ -47,13 +52,13 @@ public class RecipeController {
 
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public RecipeDTO show(@PathVariable Long id) {
+    public RecipeDTO show(@PathVariable("id") Long id) {
         return recipeService.findById(id);
     }
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable long id) {
+    public void delete(@PathVariable("id") long id) {
         recipeService.delete(id);
     }
 }

@@ -9,6 +9,18 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class AppConfig {
 
+    @Value("${test-email}")
+    private String testEmail;
+
+    @Value("${test-first-name}")
+    private String testFirstName;
+
+    @Value("${test-last-name}")
+    private String testLastName;
+
+    @Value("${test-pass}")
+    private String testPass;
+
     @Value("${gpt-token-url}")
     private String gptTokenUrl;
 

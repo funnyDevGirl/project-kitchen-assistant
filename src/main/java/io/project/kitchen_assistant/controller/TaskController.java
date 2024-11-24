@@ -38,13 +38,13 @@ public class TaskController {
 
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskDTO show(@PathVariable @NotBlank String id) {
+    public TaskDTO show(@PathVariable("id") @NotBlank String id) {
         return taskService.getById(id);
     }
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @NotBlank String id) {
+    public void delete(@PathVariable("id") @NotBlank String id) {
         taskService.delete(id);
     }
 }

@@ -26,7 +26,9 @@ public class TodoistTaskResponse {
     private String projectId;
 
     private Integer order;
+
     private String content;
+
     private String description;
 
     @JsonProperty("is_completed")
@@ -47,5 +49,6 @@ public class TodoistTaskResponse {
     private Instant createdAt;
 
     private Due due;
+
     private String url;
 }
