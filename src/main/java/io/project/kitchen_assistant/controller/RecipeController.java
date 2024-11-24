@@ -37,8 +37,8 @@ public class RecipeController {
         if (authentication == null) {
             throw new IllegalArgumentException("Authentication is required");
         }
-        String email = authentication.getName(); // Получаю email текущего пользователя
-        return recipeService.create(recipeCreateDTO, email); // Использую email для создания рецепта
+        String email = authentication.getName();
+        return recipeService.create(recipeCreateDTO, email);
     }
 
     @GetMapping

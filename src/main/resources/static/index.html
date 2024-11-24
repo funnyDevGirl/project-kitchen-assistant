@@ -214,7 +214,7 @@
                             <div class="card mb-4 recipe-item">
                                 <div class="card-body">
                                     <h4 class="card-title">${recipe.name}</h4>
-                                    <p class="card-text"><strong>Ингредиенты:</strong> ${recipe.ingredients}</p>
+                                    <p class="card-text"><strong>Ингредиенты:</strong> ${recipe.ingredients.join(', ')}</p>
                                     <p class="card-text"><strong>Приготовление:</strong> ${recipe.instructions}</p>
                                     <button class="btn btn-success save-btn" data-recipe='${JSON.stringify(recipe)}'>Добавить в избранное</button>
                                 </div>

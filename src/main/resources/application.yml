@@ -38,4 +38,9 @@ gpt-token-url: "https://iam.api.cloud.yandex.net/iam/v1/tokens"
 FOLDER_ID: "b1g9e9k3q9k3fptu8ka4"
 gpt-api-url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
+test-email: "email@example.com"
+test-first-name: "Admin"
+test-last-name: "Admin"
+test-pass: "qwerty"
+
 

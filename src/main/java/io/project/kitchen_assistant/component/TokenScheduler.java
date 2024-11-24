@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import static java.lang.String.format;
+
 @Slf4j
 @EnableScheduling
 @Component
@@ -32,9 +34,9 @@ public class TokenScheduler {
 
         if (token != null) {
             appConfig.setIAmToken(token);
-            log.info("Token updated: '{}'", token);
+            log.info("Bearer token updated!");
         } else {
-            log.error("Failed to update token.");
+            log.error("Failed to update Bearer token.");
         }
     }
 
@@ -49,8 +51,10 @@ public class TokenScheduler {
 
             if (response.getBody() != null) {
                 token = response.getBody().getIamToken();
+
             } else {
-                return "Token invalid.";
+                log.error("Failed to receive access token: response body is null");
+                return token;
             }
 
         } catch (HttpClientErrorException e) {
@@ -58,6 +62,6 @@ public class TokenScheduler {
         }
         log.info("Getting the access token successfully");
 
-        return "Bearer " + token;
+        return format("Bearer %s", token);
     }
 }

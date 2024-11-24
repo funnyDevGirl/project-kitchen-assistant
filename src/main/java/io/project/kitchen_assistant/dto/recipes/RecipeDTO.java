@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Класс для представления существующего рецепта.
  * Содержит идентификатор и информацию о рецепте.
@@ -16,6 +18,6 @@ import lombok.Setter;
 public class RecipeDTO {
     private Long id;
     private String name;
-    private String ingredients;
+    private List<String> ingredients;
     private String instructions;
 }

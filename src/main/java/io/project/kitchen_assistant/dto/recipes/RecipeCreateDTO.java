@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Класс, представляющий собой DTO (Data Transfer Object) для создания рецептов.
  * Не содержит идентификатор, так как рецепт новый и еще не хранится в системе.
@@ -15,6 +17,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RecipeCreateDTO {
     private String name;
-    private String ingredients;
+    private List<String> ingredients;
     private String instructions;
 }
