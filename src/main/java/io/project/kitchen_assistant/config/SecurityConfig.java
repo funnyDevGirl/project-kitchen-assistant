@@ -41,7 +41,6 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/**").permitAll()
                         .requestMatchers("/api/v1/login/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-                        .requestMatchers("/api/v1/oauth/**").permitAll()
                         .anyRequest().authenticated())
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

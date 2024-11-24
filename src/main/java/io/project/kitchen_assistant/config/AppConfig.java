@@ -24,9 +24,6 @@ public class AppConfig {
     @Setter
     private String iAmToken;
 
-    @Setter
-    private String todoistApiToken;
-
     @Value("${todoist-tasks-api-url}")
     private String todoistTasksApiUrl;
 
@@ -46,5 +43,5 @@ public class AppConfig {
     private String todoistAuthRedirectUri;
 
     @Value("${spring.security.oauth2.client.provider.todoist.token-uri}")
-    private String exchangeTodoistTokenUrl;
+    private String exchangeTodoistTokenUri;
 }

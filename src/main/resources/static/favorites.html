@@ -6,37 +6,107 @@
     <title>Избранные рецепты</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <style>
+        #navbar {
+            padding: 20px 40px; /* Добавляем отступы для ширины навигации */
+        }
+
+        #navbar .nav-link {
+            color: #ffffff !important; /* Формируем белый цвет для навигационных ссылок */
+            text-decoration: none; /* Без подчеркивания */
+            transition: background-color 0.3s ease; /* Плавный переход фона */
+            padding: 8px 12px; /* Отступы для добавления области щелчка */
+        }
+
+        /* Эффект затемнения при наведении */
+        #navbar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный белый фон при наведении */
+        }
+
+        /* Цвет для бренда */
+        #navbar .navbar-brand {
+            color: white !important; /* Белый цвет для названия сайта */
+        }
+
+        /* Эффект затемнения на бренде */
+        #navbar .navbar-brand:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный фон при наведении на бренд */
+        }
+
         .recipe-item { cursor: pointer; transition: border 0.2s; }
+
         .recipe-item.selected {
             border: 2px solid #007bff; /* Цвет рамки при выделении */
             background-color: rgba(0, 123, 255, 0.1); /* Цвет фона при выделении */
         }
+
         #createShoppingListBtn {
             display: none; /* Изначально скрыта */
         }
+
+        .modal {
+        background: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+        }
+
+        .modal-dialog {
+            max-width: 300px; /* Уменьшаем ширину окна */
+            margin: auto; /* Центрируем окно */
+            margin-top: 100px; /* Увеличьте значение для перемещения ниже */
+        }
+
+        .modal-content {
+            border: none; /* Убираем границы */
+            border-radius: .5rem; /* Не забываем про небольшие закругления*/
+        }
+
+        .modal-body {
+            padding: 15px; /* Установим отступы */
+        }
+
+        .modal-footer {
+            border-top: none; /* Убираем границу сверху (между сообщением и кнопкой) */
+            padding: 0; /* Убираем внутренние отступы */
+        }
+
+        .slogan {
+            font-size: 1rem; /* Уменьшаем размер шрифта слогана */
+            font-weight: bold; /* Делаем жирным */
+            font-style: italic; /* Делаем курсивом */
+            padding: 5px; /* Отступы вокруг текста */
+            border-top: 1px solid rgba(255, 255, 255, 0.3); /* Верхняя линия */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Нижняя линия */
+            margin: 0; /* Удаляем внешние отступы, если они есть */
+            margin-bottom: 10px; /* Добавляем отступ снизу */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Тень текста */
+        }
+
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
     <a class="navbar-brand" href="/">Kitchen Assistant</a>
-    <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <button class="btn btn-outline-primary" id="searchRecipesBtn">На страницу поиска</button>
-                <button id="logoutBtn" class="btn btn-outline-danger ml-2">Выйти</button>
-            </li>
-        </ul>
+    <a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
+    <a id="viewNotes" class="nav-link ml-2" href="/404.html">Созданные задачи</a>
+    <div class="ml-auto">
+        <button id="profileBtn" class="btn btn-primary ml-2">Личный кабинет</button>
+        <button id="logoutBtn" class="btn btn-danger ml-2">Выйти</button>
     </div>
 </nav>
+
+<div class="bg-dark text-white text-center py-2">
+    <span class="slogan">Находите рецепты за секунды – готовьте с удовольствием!</span>
+</div>
 
 <div class="container mt-5">
     <h3>Избранные рецепты</h3>
 
-    <p><button id="createShoppingListBtn" class="btn btn-success mt-3">Сформировать список покупок в Todoist</button></p>
+    <p><button id="createShoppingListBtn" class="btn btn-primary mt-3">Сформировать список покупок в Todoist</button></p>
 
     <div id="results"></div>
+
 
     <div id="taskForm" style="display:none;">
         <h4>Создание задачи</h4>
@@ -64,9 +134,23 @@
                 <label for="taskDueString">Дополнительная информация:</label>
                 <input type="text" class="form-control" id="taskDueString">
             </div>
-            <button type="submit" class="btn btn-primary">Создать задачу</button>
+            <button type="submit" class="btn btn-success">Создать задачу</button>
             <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button>
         </form>
+    </div>
+</div>
+
+<!-- Модальное окно для алертов -->
+<div class="modal" id="alertModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center"> <!-- Центрируем текст внутри -->
+            <div class="modal-body">
+                <p id="alertMessage">Сообщение по умолчанию</p>
+            </div>
+            <div class="modal-footer justify-content-center"> <!-- Выравнивание по центру -->
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -74,6 +158,10 @@
 <script>
     $(document).ready(function() {
         const token = localStorage.getItem('jwt-token');
+        const username = localStorage.getItem('username');
+
+        // Обновляем текст на кнопке "Личный кабинет"
+        $("#profileBtn").text(`${username}`);
 
         // Загружаем все рецепты при загрузке страницы
         $.ajax({
@@ -94,9 +182,6 @@
                                 <h4 class="card-title">${recipe.name}</h4>
                                 <p class="card-text"><strong>Ингредиенты:</strong> ${recipe.ingredients}</p>
                                 <p class="card-text"><strong>Приготовление:</strong> ${recipe.instructions}</p>
-
-                                <a href="/view.html?id=${recipe.id}" class="btn btn-info">Посмотреть рецепт</a>
-
                             </div>
                         </div>
                         `;
@@ -112,6 +197,11 @@
             }
         });
 
+        // Обработка перехода в личный кабинет
+        $("#profileBtn").click(function() {
+            const userId = localStorage.getItem('userId');
+            window.location.href = `/account.html`; // Переход на страницу профиля
+        });
 
         $("#searchRecipesBtn").click(function() {
             window.location.href = '/'; // Переход на главную страницу
@@ -152,7 +242,11 @@
             console.log(selectedRecipes.length); // Выводим количество выделенных рецептов
             // Если нет выделенных рецептов
             if (selectedRecipes.length === 0) {
-                alert("Пожалуйста, выберите хотя бы один рецепт."); // Показываем алерт
+
+                // Отобразить модальное окно с сообщением
+                $("#alertMessage").text("Пожалуйста, выберите хотя бы один рецепт.");
+                $("#alertModal").modal('show');
+
                 return; // Выходим, если нет выделенных рецептов
             }
 
@@ -182,7 +276,11 @@
                 $("#taskContent").val(ingredientsList);
                 $("#taskForm").show();
             } else {
-                alert("Пожалуйста, выберите хотя бы один рецепт.");
+
+                // Отобразить модальное окно с сообщением
+                $("#alertMessage").text("Пожалуйста, выберите хотя бы один рецепт.");
+                $("#alertModal").modal('show');
+
             }
         });
 
@@ -203,7 +301,11 @@
                 contentType: 'application/json',
                 data: JSON.stringify(taskRequest),
                 success: function(response) {
-                    alert("Задача успешно создана!");
+
+                    // Отобразить модальное окно с сообщением
+                    $("#alertMessage").text("Задача успешно создана!");
+                    $("#alertModal").modal('show');
+
                     $("#taskForm").hide();
                     $("#taskForm")[0].reset();
                     $("#createShoppingListBtn").hide(); // Скрыть кнопку после создания задачи
@@ -211,7 +313,11 @@
                 },
                 error: function(xhr, status, error) {
                     console.error("Ошибка при создании задачи: " + error);
-                    alert("Произошла ошибка при создании задачи.");
+
+                    // Отобразить модальное окно с сообщением
+                    $("#alertMessage").text("Произошла ошибка при создании задачи.");
+                    $("#alertModal").modal('show');
+
                 }
             });
         });

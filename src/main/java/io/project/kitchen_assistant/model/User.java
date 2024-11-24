@@ -24,9 +24,11 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 @EqualsAndHashCode(of = "email")
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+
     private String firstName;
     private String lastName;
 
@@ -43,8 +45,7 @@ public class User implements UserDetails {
     @Column(name = "created_at")
     private LocalDate createdAt;
 
-    private String todoistApiKey;
-
+    private String todoistToken;
 
 
     @Override

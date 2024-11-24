@@ -8,4 +8,6 @@ public interface UserService {
     UserDTO create(UserCreateDTO userCreateDTO);
 
     UserDTO findByEmail(String email);
+
+    String getCurrentUser();
 }

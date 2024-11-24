@@ -1,24 +1,104 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Главная страница</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <style>
+        #navbar {
+            padding: 20px 40px; /* Добавляем отступы для ширины навигации */
+        }
+
+        /* Стили для навигационных ссылок */
+        #navbar .nav-link {
+            color: white !important; /* Белый цвет для навигационных ссылок */
+            text-decoration: none; /* Без подчеркивания */
+            transition: background-color 0.3s ease; /* Плавный переход фона */
+            padding: 8px 12px; /* Отступы для удобного клика */
+        }
+
+        /* Эффект затемнения при наведении */
+        #navbar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный серый фон при наведении */
+        }
+
+        #navbar .navbar-brand {
+            color: white !important; /* Белый цвет для названия сайта */
+        }
+
+        .modal {
+        background: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+        }
+
+        .modal-dialog {
+            max-width: 300px; /* Уменьшаем ширину окна */
+            margin: auto; /* Центрируем окно */
+            margin-top: 100px; /* Увеличьте значение для перемещения ниже */
+        }
+
+        .modal-content {
+            border: none; /* Убираем границы */
+            border-radius: .5rem; /* Не забываем про небольшие закругления*/
+        }
+
+        .modal-body {
+            padding: 15px; /* Установим отступы */
+        }
+
+        .modal-footer {
+            border-top: none; /* Убираем границу сверху (между сообщением и кнопкой) */
+            padding: 0; /* Убираем внутренние отступы */
+        }
+
+        .invalid-feedback {
+            display: none; /* Скрыть сообщение об ошибке по умолчанию */
+        }
+
+        .is-invalid {
+            border-color: #dc3545; /* Красная граница */
+        }
+
+        .is-invalid ~ .invalid-feedback {
+            display: block; /* Показать сообщение, если поле не валидно */
+        }
+
+        .slogan {
+            font-size: 1rem; /* Уменьшаем размер шрифта слогана */
+            font-weight: bold; /* Делаем жирным */
+            font-style: italic; /* Делаем курсивом */
+            padding: 5px; /* Отступы вокруг текста */
+            border-top: 1px solid rgba(255, 255, 255, 0.3); /* Верхняя линия */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Нижняя линия */
+            margin: 0; /* Удаляем внешние отступы, если они есть */
+            margin-bottom: 10px; /* Добавляем отступ снизу */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Тень текста */
+        }
+
+    </style>
 </head>
 <body>
 <!-- Навигационный блок -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light" id="navbar" style="display: none;">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar" style="display: none;">
     <a class="navbar-brand" href="/">Kitchen Assistant</a>
+    <a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
+    <a id="viewRecipes" class="nav-link ml-2" href="/favorites.html">Избранные рецепты</a>
     <div class="ml-auto">
-        <button id="viewRecipes" class="btn btn-outline-info ml-2">Избранные рецепты</button>
-        <button id="profileBtn" class="btn btn-outline-primary ml-2">Личный кабинет</button>
-        <button id="logoutBtn" class="btn btn-outline-danger ml-2">Выйти</button>
+        <button id="profileBtn" class="btn btn-primary ml-2">Личный кабинет</button>
+        <button id="logoutBtn" class="btn btn-danger ml-2">Выйти</button>
     </div>
 </nav>
 
+<div class="bg-dark text-white text-center py-2" style="display: none;">
+    <span class="slogan">Находите рецепты за секунды – готовьте с удовольствием!</span>
+</div>
+
 <div class="container mt-5">
+
     <div id="loginContainer" class="mb-4">
         <form id="loginForm">
             <h2>Вход</h2>
@@ -62,18 +142,35 @@
     </div>
 
     <div id="searchContainer" style="display: none;">
+
+
         <h5>Приступим к поиску рецепта!</h5>
 
         <div class="input-group mb-3">
             <input type="text" id="searchQuery" class="form-control" placeholder="Введите ингредиенты..." aria-label="Запрос" aria-describedby="button-search">
             <div class="input-group-append">
                 <button class="btn btn-primary" id="searchBtn" type="button">Поиск</button>
+                <div class="invalid-feedback">Пожалуйста, введите запрос для поиска.</div> <!-- Сообщение об ошибке -->
             </div>
         </div>
     </div>
 </div>
 
 <div class="container mt-5" id="results"></div>
+
+<!-- Модальное окно для алертов -->
+<div class="modal" id="alertModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center"> <!-- Центрируем текст внутри -->
+            <div class="modal-body">
+                <p id="alertMessage">Сообщение по умолчанию</p>
+            </div>
+            <div class="modal-footer justify-content-center"> <!-- Выравнивание по центру -->
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(function() {
@@ -84,9 +181,10 @@
 
         if (token) {
             $("#navbar").show(); // Показать навигационный блок
+            $('.bg-dark.text-white').show(); // Показываем слоган
 
             // Обновляем текст на кнопке "Личный кабинет"
-            $("#profileBtn").text(`Привет, ${username}!`);
+            $("#profileBtn").text(`${username}`);
 
             $("#loginContainer").hide(); // Скрыть форму логина
             $("#searchContainer").show(); // Показать строку поиска
@@ -94,8 +192,8 @@
             $("#loginContainer").show(); // Показать форму логина
             $("#navbar").hide(); // Скрыть навигационный блок
             $("#searchContainer").hide(); // Скрыть строку поиска
+            $('.bg-dark.text-white').hide(); // Показываем слоган
         }
-
 
         // Обработка формы входа
         $("#loginForm").on("submit", function(event) {
@@ -127,12 +225,13 @@
 
                             // Обновление интерфейса
                             $("#navbar").show(); // Показать навигационный блок
-                            $("#userGreeting").text(`Привет, ${username}!`); // Установить текст приветствия
+                            $('.bg-dark.text-white').show(); // Показываем слоган
+
                             $("#loginContainer").hide(); // Скрыть форму логина
                             $("#searchContainer").show(); // Показать строку поиска
 
-                            // Обновляем текст на кнопке "Личный кабинет"
-                            $("#profileBtn").text(`Привет, ${username}!`);
+                            // Обновляем текст на кнопке "Личный кабинет" с использованием firstName
+                            $("#profileBtn").text(firstName); // Установите текст на кнопке
                         },
                         error: function(xhr, status, error) {
                             $("#message").text('Не удалось получить информацию о пользователе: ' + error);
@@ -140,7 +239,10 @@
                     });
                 },
                 error: function(xhr, status, error) {
-                    alert('Неудачная попытка входа. Попробуйте ещё раз!');
+
+                    // Отобразить модальное окно с сообщением
+                    $("#alertMessage").text("Неудачная попытка входа. Попробуйте ещё раз!");
+                    $("#alertModal").modal('show');
                 }
             });
         });
@@ -186,14 +288,23 @@
         // Обработка поиска
         $("#searchBtn").on("click", function() {
             $("#navbar").show(); // Показать навигационный блок
-
+            $('.bg-dark.text-white').show(); // Показываем слоган
 
             const query = $("#searchQuery").val();
 
             if (query.trim() === "") {
-              alert("Пожалуйста, введите ингредиенты для поиска.");
-              return; // Не продолжаем, если поле пустое
+
+                $("#searchQuery").addClass("is-invalid"); // Добавить класс для подсветки
+
+              // Здесь можно добавить сообщение об ошибке
+            //  $("#alertMessage").text("Пожалуйста, введите хотя бы один ингредиент в поле для поиска.");
+            //  $("#alertModal").modal('show');
+
+                return; // Не продолжаем, если поле пустое
             }
+
+            // Убрать класс ошибки, если есть введенные данные
+            $("#searchQuery").removeClass("is-invalid");
 
             $.ajax({
                 url: '/api/v1/recipes/search',
@@ -245,18 +356,23 @@
                                 instructions: recipe.instructions
                             }),
                             success: function(response) {
-                                alert("Рецепт успешно сохранен!");
-
                                 const recipeId = response.id; // Предполагаем, что response содержит id
                                 console.log("Saved recipe's id: ", recipeId); // Проверка, что id создался
 
                                 localStorage.setItem('lastSavedRecipeId', recipeId); // Сохраняем recipe id в localStorage
 
-                                window.location.href = '/view.html?id=' + recipeId;
-                            },
+                                // Изменение текста и цвета кнопки
+                                const button = $(this); // Ссылка на текущую кнопку
+                                button.text("Сохранено в Избранные рецепты").css("background-color", "green").attr("disabled", true); // Устанавливаем текст, цвет и отключаем кнопку
+
+                            }.bind(this), // Привязка контекста для использования $(this) внутри success
+
                             error: function(xhr, status, error) {
                                 console.error("Ошибка при сохранении рецепта: " + error);
-                                alert("Произошла ошибка при сохранении рецепта.");
+
+                                // Отобразить модальное окно с сообщением
+                                $("#alertMessage").text("Произошла ошибка при сохранении рецепта.");
+                                $("#alertModal").modal('show');
                             }
                         });
                     });
@@ -274,11 +390,6 @@
             window.location.href = `/account.html`; // Переход на страницу профиля
         });
 
-        // Обработка кликов на кнопках
-          $("#viewRecipes").on("click", function() {
-              window.location.href = "/favorites.html"; // Замените на ваш URL для рецептов
-          });
-
         // Обработка выхода
         $("#logoutBtn").click(function() {
             localStorage.removeItem('jwt-token');
@@ -286,6 +397,7 @@
             localStorage.removeItem('username');
 
             $("#navbar").hide(); // Скрыть навигационный блок
+            $('.bg-dark.text-white').hide(); // Показываем слоган
             $("#loginContainer").show(); // Показать форму логина
             $("#searchContainer").hide(); // Скрыть строку поиска
             $("#results").hide(); // Скрыть результаты поиска
@@ -295,4 +407,3 @@
 </script>
 </body>
 </html>
-

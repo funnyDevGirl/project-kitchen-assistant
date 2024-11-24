@@ -2,12 +2,15 @@ package io.project.kitchen_assistant.service;
 
 import io.project.kitchen_assistant.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
-
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CustomUserDetailsService implements UserDetailsManager {
@@ -16,8 +19,11 @@ public class CustomUserDetailsService implements UserDetailsManager {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
+        UserDetails userDetails = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found"));
+
+        log.info("User details loaded: {}", userDetails);
+        return userDetails;
     }
 
     @Override

@@ -6,57 +6,92 @@
   <title>Личный кабинет</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    #navbar {
+        padding: 20px 40px; /* Добавляем отступы для ширины навигации */
+    }
+
+    #navbar .nav-link {
+        color: white !important; /* Белый цвет для навигационных ссылок */
+        text-decoration: none; /* Без подчеркивания */
+        transition: background-color 0.3s ease; /* Плавный переход фона */
+        padding: 8px 12px; /* Отступы для удобного клика */
+    }
+
+    /* Эффект затемнения при наведении */
+    #navbar .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный серый фон при наведении */
+    }
+
+    #navbar .navbar-brand {
+        color: white !important; /* Белый цвет для названия сайта */
+    }
+
+    .slogan {
+        font-size: 1rem; /* Уменьшаем размер шрифта слогана */
+        font-weight: bold; /* Делаем жирным */
+        font-style: italic; /* Делаем курсивом */
+        padding: 5px; /* Отступы вокруг текста */
+        border-top: 1px solid rgba(255, 255, 255, 0.3); /* Верхняя линия */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Нижняя линия */
+        margin: 0; /* Удаляем внешние отступы, если они есть */
+        margin-bottom: 10px; /* Добавляем отступ снизу */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Тень текста */
+    }
+  </style>
+
 </head>
 <body>
-  <!-- Навигационный блок -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light" id="navbar">
-    <a class="navbar-brand" href="/">Kitchen Assistant</a>
-    <div class="ml-auto">
-      <button id="logoutBtn" class="btn btn-outline-danger ml-2">Выйти</button>
-    </div>
-  </nav>
+<!-- Навигационный блок -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
+<a class="navbar-brand" href="/">Kitchen Assistant</a>
+<a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
+<a id="viewRecipes" class="nav-link ml-2" href="/favorites.html">Избранные рецепты</a>
+<a id="viewNotes" class="nav-link ml-2" href="/404.html">Созданные задачи в Todoist</a>
+<div class="ml-auto">
+  <button id="logoutBtn" class="btn btn-danger ml-2">Выйти</button>
+</div>
+</nav>
+
+<div class="bg-dark text-white text-center py-2">
+  <span class="slogan">Находите рецепты за секунды – готовьте с удовольствием!</span>
+</div>
 
 
 <div class="container mt-5">
-  <h4 id="greeting">Привет, <span id="userFirstName"></span>!</h4>
-  <div class="mt-4">
-    <button id="viewRecipes" class="btn btn-outline-info ml-2">Избранные рецепты</button>
-    <button id="viewNotes" class="btn btn-outline-info ml-2">Заметки</button>
-  </div>
+<h4 id="greeting">Привет, <span id="userFirstName"></span>!</h4>
+<div class="mt-4">
+
+
+
+
+</div>
 </div>
 
 <script>
-  $(document).ready(function() {
+$(document).ready(function() {
 
-    const token = localStorage.getItem('jwt-token');
-    const username = localStorage.getItem('username');
+const token = localStorage.getItem('jwt-token');
+const username = localStorage.getItem('username');
 
-    if (!token || !username) {
-        window.location.href = "/"; // Перенаправить на страницу входа
-        return;
-    }
+if (!token || !username) {
+    window.location.href = "/"; // Перенаправить на страницу входа
+    return;
+}
 
-    // Заполняем имя пользователя из localStorage
-    $("#userFirstName").text(username);
+// Заполняем имя пользователя из localStorage
+$("#userFirstName").text(username);
 
-    // Обработка кликов на кнопках
-    $("#viewRecipes").on("click", function() {
-        window.location.href = "/favorites.html"; // Замените на ваш URL для рецептов
-    });
 
-    $("#viewNotes").on("click", function() {
-        // Здесь вы можете сделать переход на другую страницу с заметками
-        window.location.href = "/notes.html"; // Замените на ваш URL для заметок
-    });
-
-    // Обработка выхода
-    $("#logoutBtn").click(function() {
-        localStorage.removeItem('jwt-token');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('username');
-        window.location.href = '/'; // Переход на главную страницу
-    });
-  });
+// Обработка выхода
+$("#logoutBtn").click(function() {
+    localStorage.removeItem('jwt-token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    window.location.href = '/'; // Переход на главную страницу
+});
+});
 </script>
 </body>
 </html>

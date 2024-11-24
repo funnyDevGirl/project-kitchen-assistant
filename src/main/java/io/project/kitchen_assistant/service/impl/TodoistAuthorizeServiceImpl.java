@@ -1,10 +1,14 @@
 package io.project.kitchen_assistant.service.impl;
 
+import io.project.kitchen_assistant.component.DataStorage;
 import io.project.kitchen_assistant.config.AppConfig;
-import io.project.kitchen_assistant.config.AuthorizationCodeContext;
 import io.project.kitchen_assistant.dto.todoist.auth.TodoistToken;
+import io.project.kitchen_assistant.exception.UserNotFoundException;
+import io.project.kitchen_assistant.model.User;
+import io.project.kitchen_assistant.repository.UserRepository;
 import io.project.kitchen_assistant.service.StateService;
 import io.project.kitchen_assistant.service.TodoistAuthorizeService;
+import io.project.kitchen_assistant.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
@@ -24,12 +28,19 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
     private final AppConfig appConfig;
     private final RestTemplate restTemplateForGetTodoistToken;
     private final StateService stateService;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final DataStorage authorizationCodeStorage;
 
-    public TodoistAuthorizeServiceImpl(AppConfig appConfig, StateService stateService,
-                                       @Qualifier("restTemplateForGetTodoistToken") RestTemplate restTemplateForGetTodoistToken) {
+    public TodoistAuthorizeServiceImpl(AppConfig appConfig, StateService stateService, UserRepository userRepository,
+                                       @Qualifier("restTemplateForGetTodoistToken") RestTemplate restTemplateForGetTodoistToken,
+                                       UserService userService, DataStorage authorizationCodeStorage) {
         this.appConfig = appConfig;
         this.stateService = stateService;
+        this.userRepository = userRepository;
         this.restTemplateForGetTodoistToken = restTemplateForGetTodoistToken;
+        this.userService = userService;
+        this.authorizationCodeStorage = authorizationCodeStorage;
     }
 
     @Override
@@ -41,7 +52,7 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
         stateService.saveState(state, "in_progress", ttl);
 
         UriComponents uriComponents = UriComponentsBuilder
-                .fromHttpUrl("https://todoist.com/oauth/authorize")
+                .fromHttpUrl(appConfig.getTodoistAuthorizationUri())
                 .queryParam("client_id", appConfig.getTodoistClientId())
                 .queryParam("scope", appConfig.getTodoistScope())
                 .queryParam("state", state)
@@ -55,10 +66,17 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
     @Override
     public TodoistToken exchangeToken(String code) {
 
-        AuthorizationCodeContext.setAuthorizationCode(code);
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            return null;
+//        }
+//        String email = authentication.getName();
+        String email = userService.getCurrentUser(); // верен ли метод?
+
+        authorizationCodeStorage.save(email, code);
 
         ResponseEntity<TodoistToken> responseEntity = restTemplateForGetTodoistToken.exchange
-                (appConfig.getExchangeTodoistTokenUrl(), HttpMethod.POST, null, TodoistToken.class);
+                (appConfig.getExchangeTodoistTokenUri(), HttpMethod.POST, null, TodoistToken.class);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             log.info("The POST request was completed successfully, the status code '{}' was returned",
@@ -67,9 +85,15 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
             TodoistToken token = responseEntity.getBody();
 
             if (token != null) {
-                appConfig.setTodoistApiToken(token.generateBearer());
+                User user = userRepository.findByEmail(email).orElseThrow(
+                        () -> new UserNotFoundException(String.format("User with email: '%s' not found", email)));
 
-                AuthorizationCodeContext.clear();
+                user.setTodoistToken(token.generateBearer());
+
+                userRepository.save(user);
+                log.debug("Access token has been successfully added to the user with email '{}'", user.getEmail());
+
+                authorizationCodeStorage.remove(email);
             }
             return token;
 

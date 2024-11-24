@@ -8,8 +8,14 @@ import io.project.kitchen_assistant.model.User;
 import io.project.kitchen_assistant.repository.UserRepository;
 import io.project.kitchen_assistant.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -21,6 +27,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.map(userCreateDTO);
         userRepository.save(user);
 
+        log.info("User with email '{}' successfully created", user.getEmail());
         return userMapper.map(user);
     }
 
@@ -29,5 +36,18 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with email: '%s' not found", email)));
 
         return userMapper.map(user);
+    }
+
+    public String getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+                !(authentication instanceof AnonymousAuthenticationToken)) {
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            return userDetails.getUsername();
+
+        } else {
+            throw new IllegalStateException("User is not authenticated");
+        }
     }
 }

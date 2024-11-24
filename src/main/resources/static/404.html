@@ -5,20 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Страница не найдена</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        #navbar {
+            padding: 20px 40px; /* Добавляем отступы для ширины навигации */
+        }
+
+        #navbar .nav-link {
+            color: white !important; /* Белый цвет для навигационных ссылок */
+            text-decoration: none; /* Без подчеркивания */
+            transition: background-color 0.3s ease; /* Плавный переход фона */
+            padding: 8px 12px; /* Отступы для удобного клика */
+        }
+
+        /* Эффект затемнения при наведении */
+        #navbar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный серый фон при наведении */
+        }
+
+        #navbar .navbar-brand {
+            color: white !important; /* Белый цвет для названия сайта */
+        }
+
+        .slogan {
+            font-size: 1rem; /* Уменьшаем размер шрифта слогана */
+            font-weight: bold; /* Делаем жирным */
+            font-style: italic; /* Делаем курсивом */
+            padding: 5px; /* Отступы вокруг текста */
+            border-top: 1px solid rgba(255, 255, 255, 0.3); /* Верхняя линия */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Нижняя линия */
+            margin: 0; /* Удаляем внешние отступы, если они есть */
+            margin-bottom: 10px; /* Добавляем отступ снизу */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Тень текста */
+        }
+    </style>
 </head>
 <body>
-<!-- Навигационный блок -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light" id="navbar">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
     <a class="navbar-brand" href="/">Kitchen Assistant</a>
-    <div class="ml-auto">
-        <button id="logoutBtn" class="btn btn-outline-danger ml-2">Выйти</button>
+    <div class="ml-auto d-flex align-items-center">
+        <a id="profileBtn" class="nav-link ml-2" href="/account.html">Личный кабинет</a>
+        <button id="logoutBtn" class="btn btn-danger ml-2">Выйти</button>
     </div>
 </nav>
 
+<div class="bg-dark text-white text-center py-2">
+    <span class="slogan">Находите рецепты за секунды – готовьте с удовольствием!</span>
+</div>
+
 <div class="container mt-5">
-    <h1>404 - Страница не найдена! :(</h1>
+    <h1>404 - Страница не найдена :(</h1>
     <p>К сожалению, запрашиваемая страница не существует.</p>
-    <a href="/" class="btn btn-primary">Перейти на страницу поиска</a>
+    <a href="/" class="btn btn-outline-primary">Перейти на страницу поиска</a>
 </div>
 
 <script>
