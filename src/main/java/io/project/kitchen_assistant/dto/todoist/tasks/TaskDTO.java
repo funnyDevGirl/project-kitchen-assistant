@@ -24,5 +24,6 @@ public class TaskDTO {
     private String description;
 
     private Due due;
+
     private List<String> labels;
 }

@@ -1,11 +1,14 @@
 package io.project.kitchen_assistant.dto.recipes;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * Класс, представляющий собой DTO (Data Transfer Object) для создания рецептов.
@@ -18,10 +21,10 @@ import lombok.Setter;
 public class RecipeCreateDTO {
     @NotBlank
     private String name;
-    @NotBlank
-    @Size(max = 255, message = "Ingredients must be 255 characters or less")
-    private String ingredients;
-    @NotBlank
+
+    @NotEmpty(message = "Ingredients must not be empty")
+    private List<String> ingredients;
+
     @Size(max = 1000, message = "Instructions must be 1000 characters or less")
     private String instructions;
 }

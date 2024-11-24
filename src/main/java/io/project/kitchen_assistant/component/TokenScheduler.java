@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import static java.lang.String.format;
+
 @Slf4j
 @EnableScheduling
 @Component
@@ -32,7 +34,7 @@ public class TokenScheduler {
 
         if (token != null) {
             appConfig.setIAmToken(token);
-            log.debug("Token updated: '{}'", token); //убрать вообще
+            log.debug("Token updated!");
         } else {
             log.error("Failed to update token.");
         }
@@ -44,20 +46,38 @@ public class TokenScheduler {
         try {
             log.info("The receipt of the access token from Gpt begins");
 
-            ResponseEntity<TokenResponse> response = restTemplateGptTokenApi.exchange(appConfig.getGptTokenUrl(),
-                    HttpMethod.POST, new HttpEntity<>(appConfig.getJwtToken()), TokenResponse.class);
+            ResponseEntity<TokenResponse> response = restTemplateGptTokenApi.exchange(
+                    appConfig.getGptTokenUrl(),
+                    HttpMethod.POST,
+                    new HttpEntity<>(appConfig.getJwtToken()),
+                    TokenResponse.class);
 
-            if (response.getBody() != null) {
+            if (response != null && response.getBody() != null) {
                 token = response.getBody().getIamToken();
             } else {
+                log.warn("An empty or incorrect response was received.");
                 return null;
             }
 
         } catch (HttpClientErrorException e) {
             log.error("Error when getting the access token from Gpt", e);
-        }
-        log.info("Getting the access token successfully");
+            return null;
 
-        return "Bearer " + token;
+        } catch (Exception e) {
+            log.error("Unexpected error when receiving an access token", e);
+            return null;
+        }
+
+        log.debug("Getting the access token successfully");
+
+        if (token != null) {
+            log.info("The access token was successfully received");
+
+            return format("Bearer %s", token);
+
+        } else {
+            log.warn("The access token is null. A valid token cannot be returned.");
+            return null;
+        }
     }
 }

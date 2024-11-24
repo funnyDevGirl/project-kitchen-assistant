@@ -9,6 +9,7 @@ import io.project.kitchen_assistant.repository.UserRepository;
 import io.project.kitchen_assistant.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import static java.lang.String.format;
 
 @Service
 @AllArgsConstructor
@@ -21,12 +22,13 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.map(userCreateDTO);
         userRepository.save(user);
 
-        return userMapper.map(user);
+        User savedUser = userRepository.findByEmail(user.getEmail()).orElseThrow();
+        return userMapper.map(savedUser);
     }
 
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with email: '%s' not found", email)));
+                .orElseThrow(() -> new UserNotFoundException(format("User with email: '%s' not found", email)));
 
         return userMapper.map(user);
     }

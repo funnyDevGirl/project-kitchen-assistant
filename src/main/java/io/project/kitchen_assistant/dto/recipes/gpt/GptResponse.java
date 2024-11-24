@@ -12,7 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GptResponse {
-
-    @JsonProperty("result")
     private Result result;
 }
