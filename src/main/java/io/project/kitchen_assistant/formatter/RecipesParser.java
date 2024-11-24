@@ -50,11 +50,29 @@ public class RecipesParser {
             String instructionsText = parts[2].trim();
 
             String name = parseName(nameText);
+
+            if (name == null || name.isEmpty()) {
+                log.warn("Parsed name is null or empty.");
+                name = null;
+            }
+
+            List<String> ingredients = parseIngredients(ingredientsText);
+
+            if (ingredients == null || ingredients.isEmpty()) {
+                log.warn("Parsed ingredients are null or empty.");
+                ingredients = new ArrayList<>();
+            }
+
+            if (instructionsText == null || instructionsText.isEmpty()) {
+                log.warn("Instructions text is null or empty.");
+                instructionsText = null;
+            }
+
             log.debug("Name of the dish: '{}'", name);
             log.debug("Ingredients: '{}'", ingredientsText);
             log.debug("Instructions: '{}'", instructionsText);
 
-            recipes.add(new RecipeCreateDTO(name, parseIngredients(ingredientsText), instructionsText));
+            recipes.add(new RecipeCreateDTO(name, ingredients, instructionsText));
 
             startIndex = recipeIndex + 1;
             recipeCount++;
@@ -105,9 +123,8 @@ public class RecipesParser {
     }
 
     private String formatIngredient(String ingredient) {
-        ingredient = ingredient.replace(".", "")
+        return ingredient.replace(".", "")
                 .replace(";", "")
-                .trim();
-        return ingredient.toLowerCase();
+                .trim().toLowerCase();
     }
 }

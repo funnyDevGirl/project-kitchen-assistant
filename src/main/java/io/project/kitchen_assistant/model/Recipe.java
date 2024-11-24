@@ -1,6 +1,8 @@
 package io.project.kitchen_assistant.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,8 +23,13 @@ public class Recipe implements BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    @NotBlank
     private String name;
+
+    @NotEmpty
     private List<String> ingredients;
+
+    @NotBlank
     private String instructions;
 
     @ManyToOne
