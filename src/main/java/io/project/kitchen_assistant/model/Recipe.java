@@ -3,12 +3,15 @@ package io.project.kitchen_assistant.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.List;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -18,7 +21,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Recipe implements BaseEntity {
+public class Recipe {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -26,10 +29,10 @@ public class Recipe implements BaseEntity {
     @NotBlank
     private String name;
 
-    @NotEmpty
+    @NotEmpty(message = "Ingredients must not be empty")
     private List<String> ingredients;
 
-    @NotBlank
+    @Size(max = 1000, message = "Instructions must be 1000 characters or less")
     private String instructions;
 
     @ManyToOne

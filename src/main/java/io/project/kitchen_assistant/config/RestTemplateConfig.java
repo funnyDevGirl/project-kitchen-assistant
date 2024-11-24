@@ -1,7 +1,6 @@
 package io.project.kitchen_assistant.config;
 
-import io.project.kitchen_assistant.interceptors.GptHeaderInterceptor;
-import io.project.kitchen_assistant.interceptors.GptTokenHeaderInterceptor;
+import io.project.kitchen_assistant.interceptors.*;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +26,15 @@ public class RestTemplateConfig {
                                                 GptTokenHeaderInterceptor gptTokenHeaderInterceptor) {
         return builder
                 .additionalInterceptors(gptTokenHeaderInterceptor)
+                .build();
+    }
+
+
+    @Bean
+    public RestTemplate restTemplateForTodoist(RestTemplateBuilder builder,
+                                               TodoistHeaderInterceptor todoistHeaderInterceptor) {
+        return builder
+                .additionalInterceptors(todoistHeaderInterceptor)
                 .build();
     }
 }

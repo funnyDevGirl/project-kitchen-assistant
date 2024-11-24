@@ -104,7 +104,7 @@ public class RecipeControllerTest {
 
     @Test
     public void testShow_NotFound() throws Exception {
-        Long nonExistentId = 999L; // несуществующий id
+        Long nonExistentId = 999L;
 
         var request = get("/api/v1/recipes/{id}", nonExistentId);
 
@@ -116,12 +116,12 @@ public class RecipeControllerTest {
     @Test
     public void testGetFavoriteRecipes() throws Exception {
         var result = mockMvc.perform(get("/api/v1/recipes").with(token))
-                .andDo(print()) // результат в консоль
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
         var body = result.getResponse().getContentAsString();
-        System.out.println("Response Body: " + body); // Логируем тело ответа
+        System.out.println("Response Body: " + body);
 
         assertThatJson(body).isArray();
     }

@@ -23,7 +23,7 @@ public class GptHeaderInterceptor implements ClientHttpRequestInterceptor {
                                         ClientHttpRequestExecution execution) throws IOException {
 
         request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        request.getHeaders().set("x-folder-id", appConfig.getId());
+        request.getHeaders().set("x-folder-id", appConfig.getFolderId());
         request.getHeaders().set("Authorization", appConfig.getIAmToken());
 
         log.info("Sending request to URI: {}", request.getURI());
