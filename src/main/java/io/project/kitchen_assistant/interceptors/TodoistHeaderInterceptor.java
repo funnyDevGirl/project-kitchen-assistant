@@ -73,18 +73,6 @@ public class TodoistHeaderInterceptor implements ClientHttpRequestInterceptor {
             }
         }
 
-
-
-//        String email = userService.getCurrentUser();
-//
-//        log.info("Received email: '{}'", email);
-
-//        User user = userRepository.findByEmail(email).orElseThrow(
-//               () -> new UserNotFoundException(format("User with email: '%s' not found", email)));
-//
-//        String userToken = user.getTodoistToken();
-//
-//        setRequestHeaders(request, userToken);
         return execution.execute(request, body);
     }
 
