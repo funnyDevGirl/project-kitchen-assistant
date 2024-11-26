@@ -17,7 +17,7 @@ public class StateCleanupScheduler {
 
     private final StateRepository stateRepository;
 
-    @Scheduled(fixedRate = ApplicationConstants.STATE_CLEANUP_RATE)
+    @Scheduled(fixedRate = ApplicationConstants.STATE_CLEANUP_RATE_24_HOURS)
     public void deleteExpiredStates() {
         LocalDateTime now = LocalDateTime.now();
         stateRepository.deleteByTtlBefore(now);

@@ -29,7 +29,7 @@ public class TokenScheduler {
         this.restTemplateGptTokenApi = restTemplateGptTokenApi;
     }
 
-    @Scheduled(fixedRate = ApplicationConstants.TOKEN_REFRESH_RATE)
+    @Scheduled(fixedRate = ApplicationConstants.TOKEN_REFRESH_RATE_3_HOURS)
     public void scheduleFetchNewAccessToken() {
         String token = fetchNewAccessToken();
 

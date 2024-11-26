@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import static java.lang.String.format;
 
@@ -26,11 +25,11 @@ public class UserServiceImpl implements UserService {
 
     public UserDTO create(UserCreateDTO userCreateDTO) {
         User user = userMapper.map(userCreateDTO);
-        userRepository.save(user);
+
+        User savedUser = userRepository.save(user);
 
         log.info("User with email '{}' successfully created", user.getEmail());
 
-        User savedUser = userRepository.findByEmail(user.getEmail()).orElseThrow();
         return userMapper.map(savedUser);
     }
 
@@ -46,8 +45,7 @@ public class UserServiceImpl implements UserService {
         if (authentication != null && authentication.isAuthenticated() &&
                 !(authentication instanceof AnonymousAuthenticationToken)) {
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return userDetails.getUsername();
+            return authentication.getName();
 
         } else {
             throw new IllegalStateException("User is not authenticated");

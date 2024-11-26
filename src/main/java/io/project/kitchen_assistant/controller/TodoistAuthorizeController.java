@@ -24,6 +24,8 @@ public class TodoistAuthorizeController {
 
     @GetMapping("/authorize")
     public RedirectView authorize() {
+        log.info("Authorize on Todoist service begins");
+
         String authorizationUrl = todoistAuthorizeService.buildAuthUrl();
 
         return new RedirectView(authorizationUrl);

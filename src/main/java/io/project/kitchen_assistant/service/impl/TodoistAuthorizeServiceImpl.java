@@ -58,7 +58,7 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
                 .queryParam("state", state)
                 .build();
 
-        log.info("Redirecting to: {}", uriComponents.toUriString());
+        log.info("Redirecting to: {}", uriComponents.toUriString()); // позже убрать из лога URI
 
         return uriComponents.toUriString();
     }
@@ -66,12 +66,7 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
     @Override
     public TodoistToken exchangeToken(String code) {
 
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            return null;
-//        }
-//        String email = authentication.getName();
-        String email = userService.getCurrentUser(); // верен ли метод?
+        String email = userService.getCurrentUser();
 
         authorizationCodeStorage.save(email, code);
 

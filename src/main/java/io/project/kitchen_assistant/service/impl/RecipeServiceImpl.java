@@ -55,9 +55,8 @@ public class RecipeServiceImpl implements RecipeService {
                 () -> new UsernameNotFoundException(format("User with email '%s' is not logged in or does not exist", userEmail)));
 
         recipe.setUser(currentUser);
-        recipeRepository.save(recipe);
+        Recipe savedRecipe = recipeRepository.save(recipe);
 
-        Recipe savedRecipe = recipeRepository.findByName(recipe.getName()).orElseThrow();
         return recipeMapper.map(savedRecipe);
     }
 

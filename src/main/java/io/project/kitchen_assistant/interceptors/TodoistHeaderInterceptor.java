@@ -1,6 +1,5 @@
 package io.project.kitchen_assistant.interceptors;
 
-import io.project.kitchen_assistant.exception.UserNotAuthenticatedException;
 import io.project.kitchen_assistant.exception.UserNotFoundException;
 import io.project.kitchen_assistant.model.User;
 import io.project.kitchen_assistant.repository.UserRepository;
@@ -38,12 +37,6 @@ public class TodoistHeaderInterceptor implements ClientHttpRequestInterceptor {
                () -> new UserNotFoundException(format("User with email: '%s' not found", email)));
 
         String userToken = user.getTodoistToken();
-
-        if (userToken == null) {
-            log.warn("The user's token is missing, redirecting it to the Todoist login page.");
-
-            throw new UserNotAuthenticatedException("/api/v1/auth/authorize?redirectUri=/api/v1/recipes");
-        }
 
         setRequestHeaders(request, userToken);
         return execution.execute(request, body);
