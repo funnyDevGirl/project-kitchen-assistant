@@ -1,5 +1,7 @@
 package io.project.kitchen_assistant.interceptors;
 
+import io.project.kitchen_assistant.component.DataStorage;
+import io.project.kitchen_assistant.config.AppConfig;
 import io.project.kitchen_assistant.exception.UserNotFoundException;
 import io.project.kitchen_assistant.model.User;
 import io.project.kitchen_assistant.repository.UserRepository;
@@ -14,8 +16,10 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import static java.lang.String.format;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
 @Slf4j
 @AllArgsConstructor
@@ -23,22 +27,64 @@ import static java.lang.String.format;
 public class TodoistHeaderInterceptor implements ClientHttpRequestInterceptor {
 
     private final UserRepository userRepository;
+    private final DataStorage authorizationCodeStorage;
     private final UserService userService;
+    private final AppConfig appConfig;
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body,
                                         ClientHttpRequestExecution execution) throws IOException {
 
-        String email = userService.getCurrentUser();
+        log.info("Sending request to URI: {}", request.getURI());
 
-        log.info("Received email: '{}'", email);
+        String currentUserEmail = userService.getCurrentUser();
+        log.debug("Received email: '{}'", currentUserEmail);
 
-        User user = userRepository.findByEmail(email).orElseThrow(
-               () -> new UserNotFoundException(format("User with email: '%s' not found", email)));
+        if (request.getURI().toString().contains(appConfig.getTodoistTasksApiUrl())) { // TodoistHeaderInterceptor
 
-        String userToken = user.getTodoistToken();
+            User user = userRepository.findByEmail(currentUserEmail).orElseThrow(
+                    () -> new UserNotFoundException(format("User with email: '%s' not found", currentUserEmail)));
 
-        setRequestHeaders(request, userToken);
+            String userToken = user.getTodoistToken();
+
+            setRequestHeaders(request, userToken);
+
+        } else if (request.getURI().toString().equals(appConfig.getExchangeTodoistTokenUri())) { // TodoistTokenExchangeInterceptor
+
+            request.getHeaders().setContentType(APPLICATION_FORM_URLENCODED);
+
+            String code = authorizationCodeStorage.get(currentUserEmail);
+
+            if (code != null) {
+
+                String requestBody = format(
+                        "client_id=%s&client_secret=%s&code=%s&redirect_uri=%s",
+                        appConfig.getTodoistClientId(),
+                        appConfig.getTodoistClientSecret(),
+                        code,
+                        appConfig.getTodoistAuthRedirectUri()
+                );
+
+                body = requestBody.getBytes(StandardCharsets.UTF_8);
+
+            } else {
+                log.error("Authorization code is missing for user: {}", currentUserEmail);
+                throw new IllegalArgumentException("Authorization code is missing in session");
+            }
+        }
+
+
+
+//        String email = userService.getCurrentUser();
+//
+//        log.info("Received email: '{}'", email);
+
+//        User user = userRepository.findByEmail(email).orElseThrow(
+//               () -> new UserNotFoundException(format("User with email: '%s' not found", email)));
+//
+//        String userToken = user.getTodoistToken();
+//
+//        setRequestHeaders(request, userToken);
         return execution.execute(request, body);
     }
 

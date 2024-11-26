@@ -33,7 +33,7 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
     private final DataStorage authorizationCodeStorage;
 
     public TodoistAuthorizeServiceImpl(AppConfig appConfig, StateService stateService, UserRepository userRepository,
-                                       @Qualifier("restTemplateForGetTodoistToken") RestTemplate restTemplateForGetTodoistToken,
+                                       @Qualifier("restTemplateForTodoist") RestTemplate restTemplateForGetTodoistToken,
                                        UserService userService, DataStorage authorizationCodeStorage) {
         this.appConfig = appConfig;
         this.stateService = stateService;

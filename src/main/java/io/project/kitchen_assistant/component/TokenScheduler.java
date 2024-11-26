@@ -24,7 +24,7 @@ public class TokenScheduler {
     private final AppConfig appConfig;
     private final RestTemplate restTemplateGptTokenApi;
 
-    public TokenScheduler(AppConfig appConfig, @Qualifier("restTemplateForGptToken") RestTemplate restTemplateGptTokenApi) {
+    public TokenScheduler(AppConfig appConfig, @Qualifier("restTemplateForGpt") RestTemplate restTemplateGptTokenApi) {
         this.appConfig = appConfig;
         this.restTemplateGptTokenApi = restTemplateGptTokenApi;
     }

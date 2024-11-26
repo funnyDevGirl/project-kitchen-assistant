@@ -22,11 +22,22 @@ public class GptHeaderInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(HttpRequest request, byte[] body,
                                         ClientHttpRequestExecution execution) throws IOException {
 
+
         request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        request.getHeaders().set("x-folder-id", appConfig.getFolderId());
-        request.getHeaders().set("Authorization", appConfig.getIAmToken());
 
         log.info("Sending request to URI: {}", request.getURI());
+
+        if (request.getURI().toString().equals(appConfig.getGptApiUrl())) {
+
+            request.getHeaders().set("x-folder-id", appConfig.getFolderId());
+            request.getHeaders().set("Authorization", appConfig.getIAmToken());
+
+            log.info("Set headers for GPT API request.");
+
+        } else if (request.getURI().toString().equals(appConfig.getGptTokenUrl())) {
+
+            log.info("Request is going to the GPT token URL.");
+        }
 
         return execution.execute(request, body);
     }
