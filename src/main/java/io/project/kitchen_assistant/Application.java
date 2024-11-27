@@ -6,11 +6,12 @@ import io.project.kitchen_assistant.dto.users.UserCreateDTO;
 import io.project.kitchen_assistant.model.User;
 import io.project.kitchen_assistant.repository.UserRepository;
 import io.project.kitchen_assistant.service.UserService;
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import java.util.Optional;
@@ -31,9 +32,9 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @PostConstruct
-    public void init() {
-        initializeData();
+    @Bean
+    ApplicationRunner init() {
+        return args -> initializeData();
     }
 
     private void initializeData() {

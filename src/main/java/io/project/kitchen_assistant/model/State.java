@@ -1,6 +1,7 @@
 package io.project.kitchen_assistant.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
@@ -23,4 +24,7 @@ public class State {
 
     @Column(name = "ttl", nullable = false)
     private LocalDateTime ttl;
+
+    @NotBlank
+    private String userEmail;
 }

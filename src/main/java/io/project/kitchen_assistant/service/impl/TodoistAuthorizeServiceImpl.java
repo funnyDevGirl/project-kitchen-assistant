@@ -48,8 +48,10 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
         String state = UUID.randomUUID().toString();
         LocalDateTime ttl = LocalDateTime.now().plusHours(1);
 
-        log.debug("Saving State begins");
-        stateService.saveState(state, "in_progress", ttl);
+        String email = userService.getCurrentUser(); // User is not authenticated
+
+        log.info("Saving State begins");
+        stateService.saveState(state, "in_progress", ttl, email);
 
         UriComponents uriComponents = UriComponentsBuilder
                 .fromHttpUrl(appConfig.getTodoistAuthorizationUri())
@@ -64,9 +66,9 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
     }
 
     @Override
-    public TodoistToken exchangeToken(String code) {
+    public TodoistToken exchangeToken(String code, String email) {
 
-        String email = userService.getCurrentUser();
+//        String email = userService.getCurrentUser(); // Internal Server Error: User is not authenticated
 
         authorizationCodeStorage.save(email, code);
 

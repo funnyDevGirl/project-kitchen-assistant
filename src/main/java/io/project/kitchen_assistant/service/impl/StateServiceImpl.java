@@ -3,6 +3,7 @@ package io.project.kitchen_assistant.service.impl;
 import io.project.kitchen_assistant.model.State;
 import io.project.kitchen_assistant.repository.StateRepository;
 import io.project.kitchen_assistant.service.StateService;
+import io.project.kitchen_assistant.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,11 @@ import java.util.Optional;
 public class StateServiceImpl implements StateService {
 
     private final StateRepository stateRepository;
+    private final UserService userService;
 
-    public void saveState(String uuid, String status, LocalDateTime ttl) {
-        State state = new State(uuid, status, LocalDateTime.now().plusDays(1));
+    public void saveState(String uuid, String status, LocalDateTime ttl, String email) {
+        State state = new State(uuid, status, LocalDateTime.now().plusDays(1), email);
+
         stateRepository.save(state);
 
         log.debug("State '{}' successfully saved", state);

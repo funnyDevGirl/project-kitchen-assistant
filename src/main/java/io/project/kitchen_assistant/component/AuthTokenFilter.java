@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import static java.lang.String.format;
 
 @Slf4j
@@ -25,10 +27,21 @@ public class AuthTokenFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+            throws IOException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        // Установка CORS заголовков
+//        httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:8080"); // Указать фронтенд
+//        httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//        httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//
+//        // Определение обработки OPTIONS запросов
+//        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+//            httpResponse.setStatus(HttpServletResponse.SC_OK); // Возвращаем 200 OK для OPTIONS
+//            return;
+//        }
 
         log.info("Processing request: method={}, URI={}", httpRequest.getMethod(), httpRequest.getRequestURI());
 
@@ -44,16 +57,29 @@ public class AuthTokenFilter implements Filter {
 
             if (userToken == null || userToken.isEmpty()) {
 
-                httpResponse.sendRedirect("http://localhost:8080/api/v1/auth/authorize");
+                httpResponse.sendRedirect("/api/v1/auth/authorize");
+//                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 2 вариант проработки
+
+                // Отправляем JSON ответ с флагом, что требуется авторизация // 2 вариант проработки с дополнениями для фронта
+//                httpResponse.setContentType("application/json");
+//                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                PrintWriter out = httpResponse.getWriter();
+//                out.print("{\"requiresAuthorization\": true}");
+//                out.flush();
                 return;
             }
         }
 
-        chain.doFilter(request, response);
+        try {
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            log.error("Error CORS: {}", e.getMessage());
+            httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         // Инициализация фильтра (если требуется)
     }
 
@@ -62,4 +88,3 @@ public class AuthTokenFilter implements Filter {
         // Освобождение ресурсов (если требуется)
     }
 }
-

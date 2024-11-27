@@ -6,5 +6,5 @@ public interface TodoistAuthorizeService {
 
     String buildAuthUrl();
 
-    TodoistToken exchangeToken(String code);
+    TodoistToken exchangeToken(String code, String email);
 }

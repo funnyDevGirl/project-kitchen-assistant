@@ -182,6 +182,11 @@
                                 <h4 class="card-title">${recipe.name}</h4>
                                 <p class="card-text"><strong>Ингредиенты:</strong> ${recipe.ingredients.join(', ')}</p>
                                 <p class="card-text"><strong>Приготовление:</strong> ${recipe.instructions}</p>
+
+                                <button class="delete-btn btn btn-danger" style="display: none;">
+                                    <i class="fas fa-trash-alt"></i> Удалить
+                                </button>
+
                             </div>
                         </div>
                         `;
@@ -197,34 +202,19 @@
             }
         });
 
-        // Обработка перехода в личный кабинет
-        $("#profileBtn").click(function() {
-            const userId = localStorage.getItem('userId');
-            window.location.href = `/account.html`; // Переход на страницу профиля
-        });
-
-        $("#searchRecipesBtn").click(function() {
-            window.location.href = '/'; // Переход на главную страницу
-        });
-
-        // Обработка выхода
-        $("#logoutBtn").click(function() {
-            localStorage.removeItem('jwt-token');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('username');
-
-            $("#navbar").hide(); // Скрыть навигационный блок
-            $("#loginContainer").show(); // Показать форму логина
-            $("#searchContainer").hide(); // Скрыть строку поиска
-            window.location.href = '/'; // Переход на главную страницу
-        });
-
 
         // Выбор рецептов через клик
         $(document).on('click', '.recipe-item', function() {
             $(this).toggleClass('selected');
 
-            // Проверяем, есть ли выделенные рецепты
+            const deleteBtn = $(this).find('.delete-btn');
+            deleteBtn.toggle($(this).hasClass('selected')); // Показываем/скрываем кнопку удаления в зависимости от выделения
+
+            updateShoppingListButtonVisibility();
+        });
+
+        // Функция для обновления видимости кнопки "Сформировать список покупок"
+        function updateShoppingListButtonVisibility() {
             const selectedRecipesCount = $(".recipe-item.selected").length;
             console.log(`Количество выделенных рецептов: ${selectedRecipesCount}`);
 
@@ -233,7 +223,34 @@
                 $("#createShoppingListBtn").show();
             } else {
                 $("#createShoppingListBtn").hide();
+                $("#taskForm").hide();
             }
+        }
+
+        // Обработка удаления рецептов
+        $(document).on('click', '.delete-btn', function(event) {
+            event.stopPropagation(); // Чтобы клик не сработал на родительский элемент
+
+            const recipeItem = $(this).closest('.recipe-item');
+            const recipeData = recipeItem.data('recipe');
+
+            $.ajax({
+                url: `/api/v1/recipes/${recipeData.id}`, // Предполагаем, что у рецепта есть поле id
+                type: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function() {
+                    recipeItem.remove(); // Удаляем рецепт из отображения
+
+                    // Сразу обновляем видимость кнопки после удаления рецепта
+                    updateShoppingListButtonVisibility();
+                    $("#taskForm").hide();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Произошла ошибка при удалении рецепта: " + error);
+                }
+            });
         });
 
         $("#createShoppingListBtn").click(function() {
@@ -305,6 +322,17 @@
                 data: JSON.stringify(taskRequest),
                 success: function(response) {
 
+                    if (response.requiresAuthorization) {
+                        window.open('/api/v1/auth/authorize', '_blank'); // Открываем в новом окне, если требуется авторизация
+
+                        // Отобразить модальное окно с сообщением
+                        $("#alertMessage").text("Пожалуйста, авторизуйтесь в сервисе Todoist.");
+                        $("#alertModal").modal('show');
+
+                        $("#taskForm").hide();
+                    }
+
+
                     // Отобразить модальное окно с сообщением
                     $("#alertMessage").text("Задача успешно создана!");
                     $("#alertModal").modal('show');
@@ -317,9 +345,17 @@
                 error: function(xhr, status, error) {
                     console.error("Ошибка при создании задачи: " + error);
 
-                    // Отобразить модальное окно с сообщением
-                    $("#alertMessage").text("Произошла ошибка при создании задачи.");
-                    $("#alertModal").modal('show');
+                    if (xhr.status === 401) { // Ошибка 401 Unauthorized
+                        // Если токен отсутствует, перенаправляем пользователя на авторизацию в новом окне
+                        window.open('/api/v1/auth/authorize', '_blank'); // '_blank' открывает в новом окне или вкладке
+
+                    } else {
+                        console.error("Ошибка при создании задачи: " + error);
+
+                        // Отобразить модальное окно с сообщением
+                        $("#alertMessage").text("Произошла ошибка при создании задачи.");
+                        $("#alertModal").modal('show');
+                    }
 
                 }
             });
@@ -327,6 +363,28 @@
 
         $("#cancelBtn").click(function() {
             $("#taskForm").hide();
+        });
+
+        // Обработка перехода в личный кабинет
+        $("#profileBtn").click(function() {
+            const userId = localStorage.getItem('userId');
+            window.location.href = `/account.html`; // Переход на страницу профиля
+        });
+
+        $("#searchRecipesBtn").click(function() {
+            window.location.href = '/'; // Переход на главную страницу
+        });
+
+        // Обработка выхода
+        $("#logoutBtn").click(function() {
+            localStorage.removeItem('jwt-token');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+
+            $("#navbar").hide(); // Скрыть навигационный блок
+            $("#loginContainer").show(); // Показать форму логина
+            $("#searchContainer").hide(); // Скрыть строку поиска
+            window.location.href = '/'; // Переход на главную страницу
         });
     });
 </script>
