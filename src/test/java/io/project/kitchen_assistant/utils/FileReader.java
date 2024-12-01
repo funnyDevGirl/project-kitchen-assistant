@@ -1,4 +1,4 @@
-package io.project.kitchen_assistant.util;
+package io.project.kitchen_assistant.utils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -10,6 +10,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     Optional<Recipe> findByName(String name);
 
-    List<Recipe> findByUserEmail(String email);
+    List<Recipe> findAllByUserEmail(String email);
 
 }

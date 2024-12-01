@@ -2,12 +2,13 @@ package io.project.kitchen_assistant.config;
 
 /**
  * {@code ApplicationConstants} - класс для хранения констант
- * приложения для шелудеров.
+ * приложения.
  *
  * <p>
  * Этот класс содержит статические финальные переменные, которые
  * используются для определения периодичности операций,
- * таких как обновление токена и очистка состояния.
+ * таких как обновление токена и очистка состояния,
+ * а также статусы для состояния.
  * </p>
  */
 public class ApplicationConstants {
@@ -24,4 +25,16 @@ public class ApplicationConstants {
      * состояний из базы данных.
      */
     public static final long STATE_CLEANUP_RATE_24_HOURS = 24 * 60 * 60 * 1000;
+
+    /**
+     * Используется как одно из значений для поля status класса State.
+     * Устанавливается при создании State.
+     */
+    public static final String STATUS_IN_PROGRESS = "in_progress";
+
+    /**
+     * Используется как одно из значений для поля status класса State.
+     * Статус, указывающий, что поле uuid класса State было успешно проверено на соответствие.
+     */
+    public static final String STATUS_DONE = "done";
 }

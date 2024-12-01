@@ -4,7 +4,11 @@ import io.project.kitchen_assistant.exception.UserNotFoundException;
 import io.project.kitchen_assistant.model.User;
 import io.project.kitchen_assistant.repository.UserRepository;
 import io.project.kitchen_assistant.utils.UserUtils;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.Filter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -115,7 +119,7 @@ public class AuthTokenFilter implements Filter {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            httpResponse.setContentType("text/html; charset=UTF-8");
+            httpResponse.setContentType("text/html");
             httpResponse.setCharacterEncoding("UTF-8");
             httpResponse.getWriter().write(htmlResponse);
             httpResponse.setStatus(HttpServletResponse.SC_OK);

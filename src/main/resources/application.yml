@@ -26,20 +26,9 @@ spring:
     oauth2:
       client:
         registration:
-          #google:
-            #clientId: YOUR_GOOGLE_CLIENT_ID
-            #clientSecret: YOUR_GOOGLE_CLIENT_SECRET
-            #clientId: "1020982577297-ssg09nk0f0t1lad5ivrilgiupob50m5l.apps.googleusercontent.com"
-            #clientSecret: "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"
-          #scope:
-          #- email
-          #- profile
-
           todoist:
-            #client-id: ${TODOIST_CLIENT_ID}
-            client-id: a015f841860e44e38c3647bf458dfe3e
-            #client-secret: ${TODOIST_CLIENT_SECRET}
-            client-secret: cfa10873f9a04e74a1e7115269590b1d
+            client-id: ${TODOIST_CLIENT_ID}
+            client-secret: ${TODOIST_CLIENT_SECRET}
             authorization-grant-type: authorization_code
             scope: data:read_write,data:delete
             redirect-uri: https://localhost:8080/api/v1/auth/callback
@@ -57,23 +46,12 @@ rsa:
   public-key: classpath:certs/public.pem
 
 # получение token для запросов к YandexGPT:
-JWT_TOKEN: "{\"yandexPassportOauthToken\":\"y0_AgAAAAB4pbvzAATuwQAAAAERiQoLAAAJDwu7zrdIMoZCxO3EGvZ8HE3S_A\"}"
+JWT_TOKEN: ${JWT_TOKEN}
 gpt-token-url: "https://iam.api.cloud.yandex.net/iam/v1/tokens"
 
 # данные для YandexGPT:
-FOLDER_ID: "b1g9e9k3q9k3fptu8ka4"
+FOLDER_ID: ${GPT_FOLDER_ID}
 gpt-api-url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
 # данные для создания задач в Todoist:
 todoist-tasks-api-url: "https://api.todoist.com/rest/v2/tasks"
-# todoist-api-token: "Bearer 18268fda8108b8cc46448b631d3b3dcc08d52c24" - сетится клиентский
-
-# данные для авторизации в Todoist:
-#todoist-redirect-uri: "https://localhost:8080/api/v1/auth/callback" # http://localhost:8080/login/oauth2/code/todoist
-
-test-email: "email@example.com"
-test-first-name: "Admin"
-test-last-name: "Admin"
-test-pass: "qwerty"
-
-

@@ -2,7 +2,6 @@ package io.project.kitchen_assistant.repository;
 
 import io.project.kitchen_assistant.model.State;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 

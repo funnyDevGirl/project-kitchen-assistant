@@ -135,8 +135,10 @@
                 <label for="taskDueString">Дополнительная информация:</label>
                 <input type="text" class="form-control" id="taskDueString">
             </div>
-            <button type="submit" class="btn btn-success">Создать задачу</button>
-            <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button>
+
+            <p><button type="submit" class="btn btn-success">Создать задачу</button>
+            <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button></p>
+
         </form>
     </div>
 </div>
@@ -162,7 +164,7 @@
         const username = localStorage.getItem('username');
 
         // Обновляем текст на кнопке "Личный кабинет"
-        $("#profileBtn").text(`${username}`);
+        $("#profileBtn").text(username);
 
         // Загружаем все рецепты при загрузке страницы
         $.ajax({

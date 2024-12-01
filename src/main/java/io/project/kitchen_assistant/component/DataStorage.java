@@ -2,13 +2,14 @@ package io.project.kitchen_assistant.component;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
 public class DataStorage {
 
-    private final ConcurrentHashMap<String, String> storage = new ConcurrentHashMap<>();
+    private final Map<String, String> storage = new HashMap<>();
 
     public void save(String email, String data) {
         storage.put(email, data);

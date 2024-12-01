@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @Component
@@ -51,19 +52,19 @@ public class RecipesParser {
 
             String name = parseName(nameText);
 
-            if (name == null || name.isEmpty()) {
+            if (StringUtils.isEmpty(name)) {
                 log.warn("Parsed name is null or empty.");
                 name = null;
             }
 
             List<String> ingredients = parseIngredients(ingredientsText);
 
-            if (ingredients == null || ingredients.isEmpty()) {
+            if (ingredients.isEmpty()) {
                 log.warn("Parsed ingredients are null or empty.");
                 ingredients = new ArrayList<>();
             }
 
-            if (instructionsText == null || instructionsText.isEmpty()) {
+            if (StringUtils.isEmpty(instructionsText)) {
                 log.warn("Instructions text is null or empty.");
                 instructionsText = null;
             }
@@ -81,7 +82,7 @@ public class RecipesParser {
         return recipes;
     }
 
-    private String parseName(String text) {
+    public String parseName(String text) {
         StringBuilder nameBuilder = new StringBuilder();
 
         for (char ch : text.toCharArray()) {
@@ -92,7 +93,7 @@ public class RecipesParser {
         return nameBuilder.toString().trim();
     }
 
-    private List<String> parseIngredients(String text) {
+    public List<String> parseIngredients(String text) {
         List<String> ingredients = new ArrayList<>();
 
         text = text.trim();
@@ -122,7 +123,7 @@ public class RecipesParser {
         return ingredients;
     }
 
-    private String formatIngredient(String ingredient) {
+    public String formatIngredient(String ingredient) {
         return ingredient.replace(".", "")
                 .replace(";", "")
                 .trim().toLowerCase();

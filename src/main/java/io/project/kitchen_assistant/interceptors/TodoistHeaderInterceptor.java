@@ -5,7 +5,6 @@ import io.project.kitchen_assistant.config.AppConfig;
 import io.project.kitchen_assistant.exception.UserNotFoundException;
 import io.project.kitchen_assistant.model.User;
 import io.project.kitchen_assistant.repository.UserRepository;
-import io.project.kitchen_assistant.service.UserService;
 import io.project.kitchen_assistant.utils.UserUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +16,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.UUID;
 import static java.lang.String.format;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
@@ -128,14 +125,14 @@ public class TodoistHeaderInterceptor implements ClientHttpRequestInterceptor {
      */
     private void setRequestHeaders(HttpRequest request, String userToken) {
 
-        if (request.getMethod().equals(HttpMethod.POST)) {
+        if (HttpMethod.POST.equals(request.getMethod())) {
             request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             request.getHeaders().set("X-Request-Id", UUID.randomUUID().toString());
             request.getHeaders().set("Authorization", userToken);
 
             log.debug("Sending POST request to URI: {}", request.getURI());
 
-        } else if (request.getMethod().equals(HttpMethod.DELETE) || request.getMethod().equals(HttpMethod.GET)) {
+        } else if (HttpMethod.DELETE.equals(request.getMethod()) || HttpMethod.GET.equals(request.getMethod())) {
             request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             request.getHeaders().set("Authorization", userToken);
 

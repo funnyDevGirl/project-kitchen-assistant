@@ -221,6 +221,8 @@
                             const firstName = userInfo.firstName; // Предполагается, что ваш API возвращает имя пользователя
                             const userId = userInfo.id; // ID пользователя
 
+                            console.log('Текущее значение ID: ' + userId);
+
                             localStorage.setItem('username', firstName); // Сохраняем firstName в localStorage
                             localStorage.setItem('userId', userId); // Сохраняем userId в localStorage
 

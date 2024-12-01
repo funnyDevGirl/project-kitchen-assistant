@@ -64,8 +64,8 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
     public TodoistToken exchangeToken(String code, String email) {
         authorizationCodeStorage.save(email, code);
 
-        ResponseEntity<TodoistToken> responseEntity = restTemplateForGetTodoistToken.exchange
-                (appConfig.getExchangeTodoistTokenUri(), HttpMethod.POST, null, TodoistToken.class);
+        ResponseEntity<TodoistToken> responseEntity = restTemplateForGetTodoistToken.exchange(
+                appConfig.getExchangeTodoistTokenUri(), HttpMethod.POST, null, TodoistToken.class);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             log.info("The POST request was completed successfully, the status code '{}' was returned",

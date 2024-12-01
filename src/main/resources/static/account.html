@@ -50,7 +50,6 @@
 <a class="navbar-brand" href="/">Kitchen Assistant</a>
 <a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
 <a id="viewRecipes" class="nav-link ml-2" href="/favorites.html">Избранные рецепты</a>
-<a id="viewNotes" class="nav-link ml-2" href="/404.html">Созданные задачи в Todoist</a>
 <div class="ml-auto">
   <button id="logoutBtn" class="btn btn-danger ml-2">Выйти</button>
 </div>
@@ -115,7 +114,7 @@ $(document).ready(function() {
     const username = localStorage.getItem('username');
     const userId = localStorage.getItem('userId');
 
-    if (!token || !username) {
+    if (!token && !username) { // вместо ||
         window.location.href = "/"; // Перенаправить на страницу входа
         return;
     }
@@ -159,6 +158,11 @@ $(document).ready(function() {
             success: function(response) {
                 alert("Профиль успешно обновлен!");
                 $("#editProfileModal").modal('hide'); // Закрываем модальное окно
+
+                // Обновление имени в localStorage
+                localStorage.setItem('username', userUpdateData.firstName);
+                $("#userFirstName").text(userUpdateData.firstName); // Обновляем отображение имени на экране
+
             },
             error: function(xhr) {
                 alert("Ошибка при обновлении профиля: " + xhr.responseText);
@@ -178,6 +182,11 @@ $(document).ready(function() {
                 success: function() {
                     alert("Профиль успешно удалён!");
                     // Перенаправление на главную страницу или выполнение другой логики
+
+                    localStorage.removeItem('jwt-token');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('username');
+
                     window.location.href = '/';
                 },
                 error: function(xhr) {

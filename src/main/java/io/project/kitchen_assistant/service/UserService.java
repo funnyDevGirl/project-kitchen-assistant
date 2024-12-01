@@ -1,14 +1,13 @@
 package io.project.kitchen_assistant.service;
 
-import io.project.kitchen_assistant.dto.users.UserCreateDTO;
 import io.project.kitchen_assistant.dto.users.UserDTO;
-import io.project.kitchen_assistant.dto.users.UserUpdateDTO;
+import io.project.kitchen_assistant.dto.users.UserModificationDTO;
 
 public interface UserService {
 
-    UserDTO create(UserCreateDTO userCreateDTO);
+    UserDTO create(UserModificationDTO modificationDTO);
 
-    UserDTO update(UserUpdateDTO userUpdateDTO, Long id);
+    UserDTO update(UserModificationDTO modificationDTO, Long id);
 
     void delete(Long id);
 

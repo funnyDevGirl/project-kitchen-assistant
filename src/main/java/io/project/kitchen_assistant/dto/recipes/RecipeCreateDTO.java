@@ -27,4 +27,13 @@ public class RecipeCreateDTO {
 
     @Size(max = 1000, message = "Instructions must be 1000 characters or less")
     private String instructions;
+
+    @Override
+    public String toString() {
+        return "RecipeCreateDTO{"
+                + "name='" + name + '\''
+                + ", ingredients=" + ingredients
+                + ", instructions='" + instructions + '\''
+                + '}';
+    }
 }

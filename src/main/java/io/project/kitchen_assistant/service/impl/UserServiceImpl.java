@@ -1,8 +1,7 @@
 package io.project.kitchen_assistant.service.impl;
 
-import io.project.kitchen_assistant.dto.users.UserCreateDTO;
 import io.project.kitchen_assistant.dto.users.UserDTO;
-import io.project.kitchen_assistant.dto.users.UserUpdateDTO;
+import io.project.kitchen_assistant.dto.users.UserModificationDTO;
 import io.project.kitchen_assistant.exception.UserNotFoundException;
 import io.project.kitchen_assistant.mapper.UserMapper;
 import io.project.kitchen_assistant.model.User;
@@ -11,6 +10,7 @@ import io.project.kitchen_assistant.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import static java.lang.String.format;
 
 @Slf4j
@@ -21,8 +21,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserDTO create(UserCreateDTO userCreateDTO) {
-        User user = userMapper.toUser(userCreateDTO);
+    public UserDTO create(UserModificationDTO modificationDTO) {
+        User user = userMapper.toUser(modificationDTO);
 
         User savedUser = userRepository.save(user);
 
@@ -31,11 +31,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(savedUser);
     }
 
-    public UserDTO update(UserUpdateDTO userUpdateDTO, Long id) {
+    public UserDTO update(UserModificationDTO modificationDTO, Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(format("User with id: '%s' not found", id)));
 
-        userMapper.update(userUpdateDTO, user);
+        userMapper.update(modificationDTO, user);
         User updatedUser = userRepository.save(user);
 
         log.info("User with id '{}' successfully updated", user.getId());
@@ -47,6 +47,8 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(id);
 
         log.info("User with id '{}' successfully deleted", id);
+
+        userRepository.deleteById(id);
     }
 
     public UserDTO findById(Long id) {

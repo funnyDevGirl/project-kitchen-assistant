@@ -52,7 +52,8 @@ public class RecipeServiceImpl implements RecipeService {
         Recipe recipe = recipeMapper.map(recipeCreateDTO);
 
         User currentUser = userRepository.findByEmail(userEmail).orElseThrow(
-                () -> new UsernameNotFoundException(format("User with email '%s' is not logged in or does not exist", userEmail)));
+                () -> new UsernameNotFoundException(
+                        format("User with email '%s' is not logged in or does not exist", userEmail)));
 
         recipe.setUser(currentUser);
         Recipe savedRecipe = recipeRepository.save(recipe);
@@ -61,7 +62,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     public List<RecipeDTO> getAllRecipesByUserEmail(String email) {
-        List<Recipe> recipes = recipeRepository.findByUserEmail(email);
+        List<Recipe> recipes = recipeRepository.findAllByUserEmail(email);
         log.info("{} recipes were Received from the DB", recipes.size());
 
         return recipes.stream()
@@ -89,13 +90,20 @@ public class RecipeServiceImpl implements RecipeService {
         try {
             log.info("Starting an API request");
 
-            ResponseEntity<GptResponse> response = restTemplateGptApi.exchange(appConfig.getGptApiUrl(), HttpMethod.POST, new HttpEntity<>(requestBody), GptResponse.class);
+            ResponseEntity<GptResponse> response = restTemplateGptApi.exchange(
+                    appConfig.getGptApiUrl(), HttpMethod.POST, new HttpEntity<>(requestBody), GptResponse.class);
             log.debug("Response from GPT: '{}'", response);
 
-            if (response.getBody() != null && response.getBody().getResult() != null &&
-                    response.getBody().getResult().getAlternatives() != null) {
+            if (response.getBody() != null && response.getBody().getResult() != null
+                    && response.getBody().getResult().getAlternatives() != null) {
 
-                String textWithRecipes = response.getBody().getResult().getAlternatives().getFirst().getMessage().getText();
+                String textWithRecipes = response.getBody()
+                        .getResult()
+                        .getAlternatives()
+                        .getFirst()
+                        .getMessage()
+                        .getText();
+
                 log.debug("Text with recipes: '{}'", textWithRecipes);
 
                 String recipesTextWithoutMD = Formatter.formatMarkdownToText(textWithRecipes);

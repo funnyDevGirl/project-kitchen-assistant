@@ -11,40 +11,14 @@ import org.springframework.context.annotation.Configuration;
  *
  * <p>
  * Этот класс используется для получения различных свойств
- * приложения, таких как учетные данные пользователя, URL-адреса
- * API и настройки OAuth2. Все значения считываются из
- * внешнего конфигурационного файла, позволяя удобно
- * управлять параметрами при развертывании приложения.
+ * приложения, таких как URL-адреса API и настройки OAuth2.
+ * Все значения считываются из внешнего конфигурационного файла,
+ * позволяя удобно управлять параметрами при развертывании приложения.
  * </p>
  */
 @Configuration
 @Getter
 public class AppConfig {
-
-    /**
-     * Тестовый email пользователя.
-     */
-    @Value("${test-email}")
-    private String testEmail;
-
-    /**
-     * Тестовое имя пользователя.
-     */
-    @Value("${test-first-name}")
-    private String testFirstName;
-
-    /**
-     * Тестовая фамилия пользователя.
-     */
-    @Value("${test-last-name}")
-    private String testLastName;
-
-    /**
-     * Тестовый пароль пользователя.
-     */
-    @Value("${test-pass}")
-    private String testPass;
-
     /**
      * URL для получения токена YandexGPT.
      */

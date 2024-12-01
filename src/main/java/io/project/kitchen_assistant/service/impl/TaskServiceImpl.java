@@ -85,20 +85,21 @@ public class TaskServiceImpl implements TaskService {
 
     private ResponseEntity<TodoistTaskResponse> exchangeForGet(String id, String url) {
         try {
-            return restTemplateTodoistApi.exchange(url, HttpMethod.GET,null, TodoistTaskResponse.class);
+            return restTemplateTodoistApi.exchange(url, HttpMethod.GET, null, TodoistTaskResponse.class);
 
         } catch (HttpClientErrorException e) {
 
-            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
                 throw new TaskNotFoundException(String.format("Task with ID %s not found.", id));
 
-            } else if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+            } else if (HttpStatus.BAD_REQUEST.equals(e.getStatusCode())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid task ID provided: " + id);
             }
             throw new RuntimeException(String.format("Error while retrieving task: %s. %s", e.getMessage(), e));
 
         } catch (Exception e) {
-            throw new RuntimeException(String.format("Unexpected error occurred while receiving task: %s. %s", e.getMessage(), e));
+            throw new RuntimeException(
+                    format("Unexpected error occurred while receiving task: %s. %s", e.getMessage(), e));
         }
     }
 

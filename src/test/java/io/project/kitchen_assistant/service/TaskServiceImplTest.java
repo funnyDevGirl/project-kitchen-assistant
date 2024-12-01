@@ -30,7 +30,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-public class TaskServiceTest {
+public class TaskServiceImplTest {
     @Mock
     private AppConfig appConfig;
 
@@ -81,7 +81,7 @@ public class TaskServiceTest {
 
         assertNotNull(result);
         assertEquals(expectedTaskDTO, result);
-        verify(taskMapper, times(1)).toDTO(taskResponse);
+        verify(taskMapper).toDTO(taskResponse);
     }
 
     @Test
@@ -165,7 +165,7 @@ public class TaskServiceTest {
 
         assertNotNull(result);
         assertEquals(expectedTaskDTO, result);
-        verify(taskMapper, times(1)).toDTO(taskResponse);
+        verify(taskMapper).toDTO(taskResponse);
     }
 
     @Test

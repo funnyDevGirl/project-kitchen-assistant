@@ -2,7 +2,11 @@ package io.project.kitchen_assistant.dto.todoist.tasks;
 
 import io.project.kitchen_assistant.dto.todoist.tasks.response.Due;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.util.List;
 
 /**

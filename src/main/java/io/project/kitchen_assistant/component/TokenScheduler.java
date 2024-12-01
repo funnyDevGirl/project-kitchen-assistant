@@ -95,6 +95,18 @@ public class TokenScheduler {
             if (response != null && response.getBody() != null) {
                 token = response.getBody().getIamToken();
 
+                log.debug("Getting the access token successfully");
+
+                if (token != null) {
+                    log.info("The access token was successfully received");
+
+                    return format("Bearer %s", token);
+
+                } else {
+                    log.warn("The access token is null. A valid token cannot be returned.");
+                    return null;
+                }
+
             } else {
                 log.warn("An empty or incorrect response was received.");
                 return null;
@@ -106,18 +118,6 @@ public class TokenScheduler {
 
         } catch (Exception e) {
             log.error("Unexpected error when receiving an access token", e);
-            return null;
-        }
-
-        log.debug("Getting the access token successfully");
-
-        if (token != null) {
-            log.info("The access token was successfully received");
-
-            return format("Bearer %s", token);
-
-        } else {
-            log.warn("The access token is null. A valid token cannot be returned.");
             return null;
         }
     }

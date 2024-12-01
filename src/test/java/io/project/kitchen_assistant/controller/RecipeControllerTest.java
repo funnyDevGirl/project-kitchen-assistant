@@ -2,7 +2,7 @@ package io.project.kitchen_assistant.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.project.kitchen_assistant.dto.recipes.RecipeCreateDTO;
-import io.project.kitchen_assistant.dto.users.UserCreateDTO;
+import io.project.kitchen_assistant.dto.users.UserModificationDTO;
 import io.project.kitchen_assistant.mapper.RecipeMapper;
 import io.project.kitchen_assistant.mapper.UserMapper;
 import io.project.kitchen_assistant.model.Recipe;
@@ -24,7 +24,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
 import static java.lang.String.format;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,20 +40,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RecipeControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private RecipeMapper recipeMapper;
+
     @Autowired
     private RecipeRepository recipeRepository;
+
     @Autowired
     private ObjectMapper om;
+
     @Autowired
     private UserMapper userMapper;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private WebApplicationContext wac;
+
     private Recipe testRecipe;
+
     private User testUser;
+
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     private static final PostgreSQLContainer<?> postgresContainer =
@@ -74,9 +82,9 @@ public class RecipeControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        UserCreateDTO userCreateDTO = new UserCreateDTO(
+        UserModificationDTO modificationDTO = new UserModificationDTO(
                 "test@example.com", "Chuck", "Norris", "qwerty");
-        testUser = userMapper.toUser(userCreateDTO);
+        testUser = userMapper.toUser(modificationDTO);
         User savedUser = userRepository.save(testUser);
 
         token = jwt().jwt(builder -> builder.subject(savedUser.getEmail()));
@@ -94,6 +102,7 @@ public class RecipeControllerTest {
     @AfterEach
     public void clean() {
         recipeRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -131,7 +140,6 @@ public class RecipeControllerTest {
                 .andReturn();
 
         var body = result.getResponse().getContentAsString();
-        System.out.println("Response Body: " + body);
 
         assertThatJson(body).isArray();
     }
@@ -146,7 +154,7 @@ public class RecipeControllerTest {
                         .with(token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(dto)))
-                .andDo(print()) // результат в консоль
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 

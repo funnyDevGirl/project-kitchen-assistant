@@ -5,9 +5,7 @@ import io.project.kitchen_assistant.dto.recipes.RecipeDTO;
 import io.project.kitchen_assistant.model.Recipe;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
-
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,

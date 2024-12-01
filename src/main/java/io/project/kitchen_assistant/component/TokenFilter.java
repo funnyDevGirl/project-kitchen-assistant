@@ -1,7 +1,11 @@
 package io.project.kitchen_assistant.component;
 
 import io.project.kitchen_assistant.utils.JWTUtils;
-import jakarta.servlet.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,22 +46,27 @@ public class TokenFilter  implements Filter {
      * @throws ServletException при ошибках сервлета.
      */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
+            throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        if (httpRequest.getRequestURI().startsWith("/api/v1/auth/authorize")) {
+        if (httpRequest.getRequestURI() != null
+                && httpRequest.getRequestURI().startsWith("/api/v1/auth/authorize")) {
 
             log.info("Processing request: method={}, URI={}", httpRequest.getMethod(), httpRequest.getRequestURI());
 
             String jwt = httpRequest.getParameter("data");
 
-            String emailFromToken = jwtUtils.extractUsername(jwt);
+             if (jwt != null) {
+                 String emailFromToken = jwtUtils.extractUsername(jwt);
 
-            log.info("Email '{}' was successfully received from the token.", emailFromToken);
+                 log.info("Email '{}' was successfully received from the token.", emailFromToken);
 
-            final var authToken = jwtUtils.buildAuthToken(emailFromToken);
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+                 final var authToken = jwtUtils.buildAuthToken(emailFromToken);
+                 SecurityContextHolder.getContext().setAuthentication(authToken);
+             }
         }
+
 
         filterChain.doFilter(request, response);
     }

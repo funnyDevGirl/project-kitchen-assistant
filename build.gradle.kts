@@ -44,7 +44,6 @@ dependencies {
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
-	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -79,8 +78,11 @@ dependencies {
 	testImplementation("org.mockito:mockito-core:5.5.0")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0")
 	implementation("javax.validation:validation-api:1.0.0.GA")
-	implementation("io.jsonwebtoken:jjwt:0.9.1")
+	testImplementation("io.github.hakky54:logcaptor:2.10.0")
 
+	testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
+	implementation("org.wiremock.integrations.testcontainers:wiremock-testcontainers-module:1.0-alpha-13")
+	implementation("org.springframework.cloud:spring-cloud-contract-wiremock:4.1.4")
 }
 
 
