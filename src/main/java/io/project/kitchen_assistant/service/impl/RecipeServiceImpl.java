@@ -84,22 +84,22 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeCreateDTO> searchRecipes(String query) throws Exception {
 
         String requestBody = createRequestBody(query);
-        log.info("Constructed HTTP request body:\n{}", requestBody);
+        log.debug("Constructed HTTP request body:\n{}", requestBody);
 
         try {
             log.info("Starting an API request");
 
             ResponseEntity<GptResponse> response = restTemplateGptApi.exchange(appConfig.getGptApiUrl(), HttpMethod.POST, new HttpEntity<>(requestBody), GptResponse.class);
-            log.info("Response from GPT: '{}'", response);
+            log.debug("Response from GPT: '{}'", response);
 
             if (response.getBody() != null && response.getBody().getResult() != null &&
                     response.getBody().getResult().getAlternatives() != null) {
 
                 String textWithRecipes = response.getBody().getResult().getAlternatives().getFirst().getMessage().getText();
-                log.info("Text with recipes: '{}'", textWithRecipes);
+                log.debug("Text with recipes: '{}'", textWithRecipes);
 
                 String recipesTextWithoutMD = Formatter.formatMarkdownToText(textWithRecipes);
-                log.info("Recipes Text Without MD: '{}'", recipesTextWithoutMD);
+                log.debug("Recipes Text Without MD: '{}'", recipesTextWithoutMD);
 
                 List<RecipeCreateDTO> recipes = recipesParser.parseRecipesText(recipesTextWithoutMD);
                 log.info("{} recipes have been successfully received from the API", recipes.size());

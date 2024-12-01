@@ -2,6 +2,7 @@ package io.project.kitchen_assistant.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.project.kitchen_assistant.dto.recipes.RecipeCreateDTO;
+import io.project.kitchen_assistant.dto.users.UserCreateDTO;
 import io.project.kitchen_assistant.mapper.RecipeMapper;
 import io.project.kitchen_assistant.mapper.UserMapper;
 import io.project.kitchen_assistant.model.Recipe;
@@ -22,6 +23,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import static java.lang.String.format;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -70,11 +74,17 @@ public class RecipeControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        testUser = userRepository.findByEmail("email@example.com").orElseThrow();
-        token = jwt().jwt(builder -> builder.subject("email@example.com"));
+        UserCreateDTO userCreateDTO = new UserCreateDTO(
+                "test@example.com", "Chuck", "Norris", "qwerty");
+        testUser = userMapper.toUser(userCreateDTO);
+        User savedUser = userRepository.save(testUser);
 
-        RecipeCreateDTO dto = new RecipeCreateDTO("Пирог", "форель - 500г; лук - 200г; тесто - любое",
+        token = jwt().jwt(builder -> builder.subject(savedUser.getEmail()));
+
+        RecipeCreateDTO dto = new RecipeCreateDTO("Пирог",
+                List.of("форель - 500г", "лук - 200г", "тесто - любое"),
                 "Ингредиенты нарезать. Завернуть в тесто.");
+
         testRecipe = recipeMapper.map(dto);
         testRecipe.setUser(testUser);
 
@@ -110,7 +120,7 @@ public class RecipeControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Recipe with id: " + nonExistentId + " not found"));
+                .andExpect(content().string(format("Recipe with id: '%s' not found", nonExistentId)));
     }
 
     @Test
@@ -128,7 +138,8 @@ public class RecipeControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        RecipeCreateDTO dto = new RecipeCreateDTO("Салат лёгкий", "капуста - 200г; кинза - 50г; масло оливковое",
+        RecipeCreateDTO dto = new RecipeCreateDTO("Салат лёгкий",
+                List.of("капуста - 200г", "кинза - 50г", "масло оливковое"),
                 "Капусту нарезать соломкой. Добавить кинзу и немного масла.");
 
         mockMvc.perform(post("/api/v1/recipes")

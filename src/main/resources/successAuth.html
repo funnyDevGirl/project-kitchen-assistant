@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Успех</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h2 {
+            color: #4CAF50; /* Зеленый цвет для заголовка */
+        }
+
+        h3 {
+            color: #555; /* Темно-серый цвет для подзаголовка */
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .message-box {
+            background-color: white; /* Белый фон для блока */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="message-box">
+    <h2>Авторизация в Todoist прошла успешно!</h2>
+    <h3>Можно сформировать список покупок!</h3>
+    <p>Окно автоматически закроется через 10 секунд...</p>
+</div>
+<script type='text/javascript'>
+    setTimeout(function() {
+        window.close();
+    }, 10000);
+</script>
+</body>
+</html>
+

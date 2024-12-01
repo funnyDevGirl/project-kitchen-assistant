@@ -1,6 +1,8 @@
 package io.project.kitchen_assistant.config;
 
+import io.project.kitchen_assistant.component.TokenFilter;
 import io.project.kitchen_assistant.service.impl.CustomUserDetailsService;
+import io.project.kitchen_assistant.utils.JWTUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -24,6 +27,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final JwtDecoder jwtDecoder;
+    private final JWTUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
 
@@ -33,16 +37,16 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .logout(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .headers(AbstractHttpConfigurer::disable)
+                .addFilterBefore(new TokenFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class)
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/**").permitAll()
                         .requestMatchers("/api/v1/login/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-                        .requestMatchers("/api/v1/auth/authorize", "/api/v1/auth/callback").permitAll()
+                        .requestMatchers("/api/v1/auth/callback", "/api/v1/auth/close").permitAll()
                         .anyRequest().authenticated())
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

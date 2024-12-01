@@ -83,13 +83,17 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Тень текста */
         }
 
+        .custom-badge {
+            font-size: 1rem; /* Увеличиваем размер шрифта */
+            padding: 0.3em 0.8em; /* Увеличиваем внутренние отступы */
+            margin: 0.2rem; /* Отступы между метками */
+        }
     </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
     <a class="navbar-brand" href="/">Kitchen Assistant</a>
     <a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
-    <a id="viewNotes" class="nav-link ml-2" href="/404.html">Созданные задачи</a>
     <div class="ml-auto">
         <button id="profileBtn" class="btn btn-primary ml-2">Личный кабинет</button>
         <button id="logoutBtn" class="btn btn-danger ml-2">Выйти</button>
@@ -107,7 +111,6 @@
 
     <div id="results"></div>
 
-
     <div id="taskForm" style="display:none;">
         <h4>Создание задачи</h4>
         <form id="createTask">
@@ -120,11 +123,9 @@
                 <input type="text" class="form-control" id="taskDescription" required>
             </div>
             <div class="form-group">
-                <label for="taskLabels">Метки:</label>
-                <select multiple class="form-control" id="taskLabels">
-                    <option value="Food" selected>Food</option>
-                    <option value="Shopping" selected>Shopping</option>
-                </select>
+                <label>Метки:</label>
+                <div id="taskLabelsContainer" class="mb-2">
+                </div>
             </div>
             <div class="form-group">
                 <label for="taskDueDate">Дата выполнения:</label>
@@ -140,20 +141,20 @@
     </div>
 </div>
 
-<!-- Модальное окно для алертов -->
+<!-- Пример модального окна -->
 <div class="modal" id="alertModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <div class="modal-content text-center"> <!-- Центрируем текст внутри -->
+        <div class="modal-content text-center">
             <div class="modal-body">
                 <p id="alertMessage">Сообщение по умолчанию</p>
             </div>
-            <div class="modal-footer justify-content-center"> <!-- Выравнивание по центру -->
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" onclick="window.open('https://todoist.com', '_blank')">Перейти в Todoist</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
             </div>
         </div>
     </div>
 </div>
-
 
 <script>
     $(document).ready(function() {
@@ -168,7 +169,7 @@
             url: '/api/v1/recipes',
             type: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}` // Передаем токен в заголовках
+                'Authorization': `Bearer ${token}`
             },
             contentType: 'application/json',
             success: function(recipes) {
@@ -257,6 +258,7 @@
             const selectedRecipes = $(".recipe-item.selected");
 
             console.log(selectedRecipes.length); // Выводим количество выделенных рецептов
+
             // Если нет выделенных рецептов
             if (selectedRecipes.length === 0) {
 
@@ -267,7 +269,9 @@
                 return; // Выходим, если нет выделенных рецептов
             }
 
-            let ingredientsList = "";
+            let ingredientsText = "";
+            let recipeNames = [];  // Массив для хранения названий выбранных рецептов
+            const labels = ["Food", "Shopping"]; // Предустановленные метки
 
             selectedRecipes.each(function() {
                 const recipe = $(this).data('recipe');
@@ -276,30 +280,70 @@
                 console.log("Current element:", $(this)); // Выводим элемент
                 console.log("Recipe data:", recipe); // Выводим рецепт
 
-                // Выводим рецепт в консоль
-                console.log(recipe); // Печать объекта рецепта в консоли
+                // Проверка на наличие ингредиентов
+                if (recipe && Array.isArray(recipe.ingredients)) {
 
-                // Добавьте проверку на существование рецепта и его ингредиентов
-                if (recipe && recipe.ingredients) {
-                    ingredientsList += `${recipe.ingredients}, `;
+                    ingredientsText += `${recipe.name}:\n`; // Добавляем имя рецепта и новую строку
+
+                    recipe.ingredients.forEach(ingredient => {
+                        ingredientsText += `${ingredient.trim()}\n`; // Добавляем каждый ингредиент в текстовом формате
+                    });
+
+                    recipeNames.push(recipe.name); // Сохраняем название рецепта для описания
                 } else {
-                    console.warn("Recipe or ingredients are not defined", recipe);
+                    console.warn("Recipe does not have ingredients or is not an array", recipe);
                 }
-
             });
 
-            if (ingredientsList) {
-                ingredientsList = ingredientsList.slice(0, -2);
-                $("#taskContent").val(ingredientsList);
-                $("#taskForm").show();
-            } else {
+            if (ingredientsText) {
+                // Отображаем ингредиенты в виде списка
+                $("#taskContent").html(ingredientsText); // Вставляем список ингредиентов
+                $("#taskDescription").val(`Купить продукты для приготовления: ${recipeNames.join(', ')}`); // Устанавливаем строку в поле "Описание"
 
+                // Отображаем метки
+                let labelsHtml = labels.map(label => `<span class="badge badge-secondary custom-badge">${label}</span>`).join(' ');
+                $("#taskLabelsContainer").html(labelsHtml);  // Вставляем метки в контейнер
+
+                $("#taskForm").show();
+
+                // Установка текущей даты по умолчанию
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+                const day = String(today.getDate()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day}`;
+                $("#taskDueDate").val(formattedDate); // Устанавливаем в поле даты
+            } else {
                 // Отобразить модальное окно с сообщением
                 $("#alertMessage").text("Пожалуйста, выберите хотя бы один рецепт.");
                 $("#alertModal").modal('show');
-
             }
         });
+
+
+        // Переменная для хранения ссылки на маленькое окно
+        let smallWindow;
+
+        function handleUnauthorized() {
+            // Открываем новое окно с заданными размерами
+            const redirectUrl = `/api/v1/auth/authorize?data=${token}`;
+            smallWindow = window.open(redirectUrl, 'authorizeWindow', 'width=900,height=700');
+
+            if (smallWindow) {
+                // Если окно успешно открыто, скрываем формы
+                $("#taskForm").hide();
+                $("#createShoppingListBtn").hide(); // Скрыть кнопку после создания задачи
+                $(".recipe-item").removeClass('selected'); // Снять выделение с рецептов
+                $('.delete-btn').hide(); // Скрыть кнопку удаления
+
+                window.opener.location.reload(); // Обновляем родительское окно
+
+            } else {
+                // Если окно не открылось (например, блокировщик всплывающих окон)
+                $("#alertMessage").text("Не удалось открыть окно авторизации. Пожалуйста, проверьте настройки вашего браузера.");
+                $("#alertModal").modal('show');
+            }
+        }
 
         $("#createTask").submit(function(event) {
             event.preventDefault();
@@ -307,7 +351,7 @@
             const taskRequest = {
                 content: $("#taskContent").val(),
                 description: $("#taskDescription").val(),
-                labels: Array.from($("#taskLabels").val()),
+                labels: ["Food", "Shopping"],
                 dueDate: $("#taskDueDate").val(),
                 dueString: $("#taskDueString").val()
             };
@@ -316,38 +360,37 @@
                 url: '/api/v1/tasks',
                 type: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}` // Передаем токен в заголовках
+                    'Authorization': `Bearer ${token}`
                 },
                 contentType: 'application/json',
                 data: JSON.stringify(taskRequest),
                 success: function(response) {
 
-                    if (response.requiresAuthorization) {
-                        window.open('/api/v1/auth/authorize', '_blank'); // Открываем в новом окне, если требуется авторизация
-
-                        // Отобразить модальное окно с сообщением
-                        $("#alertMessage").text("Пожалуйста, авторизуйтесь в сервисе Todoist.");
-                        $("#alertModal").modal('show');
-
-                        $("#taskForm").hide();
-                    }
-
-
                     // Отобразить модальное окно с сообщением
                     $("#alertMessage").text("Задача успешно создана!");
+
+                    // Добавляем обработчик события закрытия модального окна
+                    $('#alertModal').on('hidden.bs.modal', function () {
+                      window.location.href = '/';
+                    });
+
+                    // Показываем модальное окно
                     $("#alertModal").modal('show');
 
+                    // Скрываем форму задачи
                     $("#taskForm").hide();
+                    $("#createShoppingListBtn").hide();
+                    $(".recipe-item").removeClass('selected');
+                    $('.delete-btn').hide();
+
+                    // Сброс формы
                     $("#taskForm")[0].reset();
-                    $("#createShoppingListBtn").hide(); // Скрыть кнопку после создания задачи
-                    $(".recipe-item").removeClass('selected'); // Снять выделение с рецептов
                 },
                 error: function(xhr, status, error) {
                     console.error("Ошибка при создании задачи: " + error);
 
-                    if (xhr.status === 401) { // Ошибка 401 Unauthorized
-                        // Если токен отсутствует, перенаправляем пользователя на авторизацию в новом окне
-                        window.open('/api/v1/auth/authorize', '_blank'); // '_blank' открывает в новом окне или вкладке
+                    if (xhr.status === 401) {
+                       handleUnauthorized();
 
                     } else {
                         console.error("Ошибка при создании задачи: " + error);
@@ -360,6 +403,7 @@
                 }
             });
         });
+
 
         $("#cancelBtn").click(function() {
             $("#taskForm").hide();

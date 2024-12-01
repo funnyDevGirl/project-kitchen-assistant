@@ -5,13 +5,20 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-
 public class Formatter {
 
     public static String formatMarkdownToText(String text) {
         String html = formatMarkdownToHtml(text);
         String cleanText = formatHtmlToText(html);
-        return cleanText.replaceAll("[\\n\\*]*", "");
+
+        StringBuilder result = new StringBuilder();
+
+        for (char c : cleanText.toCharArray()) {
+            if (c != '\n' && c != '*') {
+                result.append(c);
+            }
+        }
+        return result.toString();
     }
 
     private static String formatMarkdownToHtml(String text) {

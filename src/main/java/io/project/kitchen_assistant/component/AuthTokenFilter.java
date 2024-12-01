@@ -3,51 +3,97 @@ package io.project.kitchen_assistant.component;
 import io.project.kitchen_assistant.exception.UserNotFoundException;
 import io.project.kitchen_assistant.model.User;
 import io.project.kitchen_assistant.repository.UserRepository;
-import io.project.kitchen_assistant.service.UserService;
+import io.project.kitchen_assistant.utils.UserUtils;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import static java.lang.String.format;
 
-@Slf4j
+/**
+ * {@code AuthTokenFilter} - фильтр для аутентификации пользователей
+ * и управления доступом к защищенным ресурсам.
+ *
+ * <p>
+ * Этот фильтр проверяет наличие JWT токена в заголовке авторизации,
+ * а также гарантирует, что пользователи имеют доступ к ресурсам на основе
+ * их аутентифицированного состояния. Фильтр также обрабатывает
+ * специальные запросы к ресурсам, связанным с аутентификацией.
+ * </p>
+ *
+ * <p>
+ * Фильтр выполняет следующие задачи:
+ * <ul>
+ *     <li>Извлечение JWT токена из запроса.</li>
+ *     <li>Проверка разрешений для доступа к эндпоинтам, таким как
+ *         "/api/v1/tasks".</li>
+ *     <li>Возврат HTML-ответа при запросе к эндпоинту
+ *         "/api/v1/auth/close".</li>
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * Фильтр запускается перед обработкой запроса и может изменять
+ * состояние {@code HttpServletResponse} в зависимости от логики
+ * аутентификации.
+ * </p>
+ */
 @Component
+@Slf4j
 public class AuthTokenFilter implements Filter {
 
     @Autowired
-    private UserService userService;
+    private UserUtils userUtils;
 
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Метод, выполняющий фильтрацию входящих HTTP-запросов.
+     *
+     * <p>
+     * Этот метод проверяет наличие JWT токена в заголовке
+     * авторизации и устанавливает аутентификацию пользователя в
+     * {@code SecurityContext}, если токен действителен.
+     * </p>
+     *
+     * <p>
+     * Если токен недействителен или отсутствует, фильтр
+     * устанавливает статус ответа {@code SC_UNAUTHORIZED} (401).
+     * Если пользователь обращается к эндпоинту
+     * "/api/v1/auth/close", он получает HTML-ответ.
+     * </p>
+     *
+     * @param request  объект {@code ServletRequest}, представляющий
+     *                 входящий запрос.
+     * @param response объект {@code ServletResponse}, представляющий
+     *                 выходящий ответ.
+     * @param chain    цепочка фильтров для передачи управления.
+     * @throws IOException      если происходит ошибка ввода-вывода.
+     * @throws ServletException если возникает ошибка в сервлете.
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException {
+            throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        // Установка CORS заголовков
-//        httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:8080"); // Указать фронтенд
-//        httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//        httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//
-//        // Определение обработки OPTIONS запросов
-//        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
-//            httpResponse.setStatus(HttpServletResponse.SC_OK); // Возвращаем 200 OK для OPTIONS
-//            return;
-//        }
+        String jwtToken = httpRequest.getHeader("Authorization");
+        httpResponse.setHeader("Authorization", jwtToken);
 
         log.info("Processing request: method={}, URI={}", httpRequest.getMethod(), httpRequest.getRequestURI());
 
         if (httpRequest.getRequestURI().equals("/api/v1/tasks")) {
 
-            String email = userService.getCurrentUser();
+            String email = userUtils.getCurrentUserEmail();
             log.info("Received email: '{}'", email);
 
             User user = userRepository.findByEmail(email).orElseThrow(
@@ -57,34 +103,51 @@ public class AuthTokenFilter implements Filter {
 
             if (userToken == null || userToken.isEmpty()) {
 
-                httpResponse.sendRedirect("/api/v1/auth/authorize");
-//                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 2 вариант проработки
-
-                // Отправляем JSON ответ с флагом, что требуется авторизация // 2 вариант проработки с дополнениями для фронта
-//                httpResponse.setContentType("application/json");
-//                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//                PrintWriter out = httpResponse.getWriter();
-//                out.print("{\"requiresAuthorization\": true}");
-//                out.flush();
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
+
+        } else if (httpRequest.getRequestURI().equals("/api/v1/auth/close")) {
+            String htmlResponse = null;
+            try {
+                htmlResponse = readHtmlFile("successAuth.html");
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            httpResponse.setContentType("text/html; charset=UTF-8");
+            httpResponse.setCharacterEncoding("UTF-8");
+            httpResponse.getWriter().write(htmlResponse);
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+            return;
         }
 
-        try {
-            chain.doFilter(request, response);
-        } catch (Exception e) {
-            log.error("Error CORS: {}", e.getMessage());
-            httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        chain.doFilter(request, response);
+    }
+
+    /**
+     * Считывает HTML-файл из ресурсов приложения.
+     * Вданном случае файл с текстом для появляющегося окна после успешной авторизации в Todoist.
+     *
+     * @param fileName имя HTML-файла, который необходимо считать.
+     * @return содержимое HTML-файла как {@code String}.
+     * @throws IOException если файл не найден или произошла ошибка ввода-вывода.
+     */
+    private String readHtmlFile(String fileName) throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+
+        if (inputStream == null) {
+            throw new IOException("Html file was not found: " + fileName);
         }
-    }
 
-    @Override
-    public void init(FilterConfig filterConfig) {
-        // Инициализация фильтра (если требуется)
-    }
+        StringBuilder htmlBuilder = new StringBuilder();
 
-    @Override
-    public void destroy() {
-        // Освобождение ресурсов (если требуется)
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                htmlBuilder.append(line);
+            }
+        }
+        return htmlBuilder.toString();
     }
 }

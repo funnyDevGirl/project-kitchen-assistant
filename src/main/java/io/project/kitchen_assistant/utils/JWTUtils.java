@@ -2,7 +2,9 @@ package io.project.kitchen_assistant.utils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +13,7 @@ import org.springframework.stereotype.Component;
 public class JWTUtils {
 
     private final JwtEncoder encoder;
-    private final JwtDecoder decoder; // Добавьте декодер
-
+    private final JwtDecoder decoder;
 
     public String generateToken(String username) {
         Instant now = Instant.now();
@@ -23,5 +24,18 @@ public class JWTUtils {
                 .subject(username)
                 .build();
         return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    public String extractUsername(String token) {
+        Jwt jwt = this.decoder.decode(token);
+        return jwt.getSubject();
+    }
+
+    public UsernamePasswordAuthenticationToken buildAuthToken(final String username) {
+        return new UsernamePasswordAuthenticationToken(
+                username,
+                null,
+                List.of()
+        );
     }
 }

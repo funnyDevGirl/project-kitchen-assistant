@@ -79,6 +79,7 @@ dependencies {
 	testImplementation("org.mockito:mockito-core:5.5.0")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0")
 	implementation("javax.validation:validation-api:1.0.0.GA")
+	implementation("io.jsonwebtoken:jjwt:0.9.1")
 
 }
 

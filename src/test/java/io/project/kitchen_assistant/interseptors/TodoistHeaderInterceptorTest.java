@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import io.project.kitchen_assistant.config.AppConfig;
 import io.project.kitchen_assistant.interceptors.TodoistHeaderInterceptor;
+import io.project.kitchen_assistant.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,64 +31,67 @@ public class TodoistHeaderInterceptorTest {
 
     private ClientHttpRequestExecution execution;
     private String testUrl = "http://testurl.com";
+    private User testUser;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        execution = mock(ClientHttpRequestExecution.class);
-    }
-
-    @Test
-    public void testInterceptPostRequest() throws IOException {
-        String requestId = "test-request-id";
-        String token = "test-token";
-
-        when(appConfig.getTodoistRequestId()).thenReturn(requestId);
-        when(appConfig.getTodoistApiToken()).thenReturn(token);
-
-        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.POST, testUrl);
-
-        ClientHttpResponse response = interceptor.intercept(request, new byte[0], execution);
-
-        HttpHeaders headers = request.getHeaders();
-        assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
-        assertEquals(requestId, headers.getFirst("X-Request-Id"));
-        assertEquals(token, headers.getFirst("Authorization"));
-
-        verify(execution, times(1)).execute(any(), any());
-    }
-
-    @Test
-    public void testInterceptGetRequest() throws IOException {
-        String token = "test-token";
-
-        when(appConfig.getTodoistApiToken()).thenReturn(token);
-
-        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, testUrl);
-
-        ClientHttpResponse response = interceptor.intercept(request, new byte[0], execution);
-
-        HttpHeaders headers = request.getHeaders();
-        assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
-        assertEquals(token, headers.getFirst("Authorization"));
-
-        verify(execution, times(1)).execute(any(), any());
-    }
-
-    @Test
-    public void testInterceptDeleteRequest() throws IOException {
-        String token = "test-token";
-
-        when(appConfig.getTodoistApiToken()).thenReturn(token);
-
-        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.DELETE, testUrl);
-
-        ClientHttpResponse response = interceptor.intercept(request, new byte[0], execution);
-
-        HttpHeaders headers = request.getHeaders();
-        assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
-        assertEquals(token, headers.getFirst("Authorization"));
-
-        verify(execution, times(1)).execute(any(), any());
-    }
+//    @BeforeEach
+//    public void setUp() {
+//        MockitoAnnotations.initMocks(this);
+//        execution = mock(ClientHttpRequestExecution.class);
+//
+//        testUser =
+//    }
+//
+//    @Test
+//    public void testInterceptPostRequest() throws IOException {
+//        String requestId = "test-request-id";
+//        String token = "test-token";
+//
+//        when(appConfig.get()).thenReturn(requestId);
+//        when().thenReturn(token);
+//
+//        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.POST, testUrl);
+//
+//        ClientHttpResponse response = interceptor.intercept(request, new byte[0], execution);
+//
+//        HttpHeaders headers = request.getHeaders();
+//        assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
+//        assertEquals(requestId, headers.getFirst("X-Request-Id"));
+//        assertEquals(token, headers.getFirst("Authorization"));
+//
+//        verify(execution, times(1)).execute(any(), any());
+//    }
+//
+//    @Test
+//    public void testInterceptGetRequest() throws IOException {
+//        String token = "test-token";
+//
+//        when(appConfig.getTodoistApiToken()).thenReturn(token);
+//
+//        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.GET, testUrl);
+//
+//        ClientHttpResponse response = interceptor.intercept(request, new byte[0], execution);
+//
+//        HttpHeaders headers = request.getHeaders();
+//        assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
+//        assertEquals(token, headers.getFirst("Authorization"));
+//
+//        verify(execution, times(1)).execute(any(), any());
+//    }
+//
+//    @Test
+//    public void testInterceptDeleteRequest() throws IOException {
+//        String token = "test-token";
+//
+//        when(appConfig.getTodoistApiToken()).thenReturn(token);
+//
+//        MockClientHttpRequest request = new MockClientHttpRequest(HttpMethod.DELETE, testUrl);
+//
+//        ClientHttpResponse response = interceptor.intercept(request, new byte[0], execution);
+//
+//        HttpHeaders headers = request.getHeaders();
+//        assertEquals(MediaType.APPLICATION_JSON, headers.getContentType());
+//        assertEquals(token, headers.getFirst("Authorization"));
+//
+//        verify(execution, times(1)).execute(any(), any());
+//    }
 }

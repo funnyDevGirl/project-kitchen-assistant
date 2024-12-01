@@ -42,17 +42,17 @@ public class Application {
 
         Optional<User> existingUser = userRepository.findByEmail(appConfig.getTestEmail());
         if (existingUser.isEmpty()) {
-            var admin = new UserCreateDTO();
-            admin.setEmail(appConfig.getTestEmail());
-            admin.setFirstName(appConfig.getTestFirstName());
-            admin.setLastName(appConfig.getTestLastName());
-            admin.setPassword(appConfig.getTestPass());
+            UserCreateDTO userForTestApp = new UserCreateDTO();
+            userForTestApp.setEmail(appConfig.getTestEmail());
+            userForTestApp.setFirstName(appConfig.getTestFirstName());
+            userForTestApp.setLastName(appConfig.getTestLastName());
+            userForTestApp.setPassword(appConfig.getTestPass());
 
-            userService.create(admin);
-            log.info("Admin account created: {}", appConfig.getTestEmail());
+            userService.create(userForTestApp);
+            log.info("Test User account created: {}", appConfig.getTestEmail());
 
         } else {
-            log.info("Admin account already exists: {}", appConfig.getTestEmail());
+            log.info("Test User account already exists: {}", appConfig.getTestEmail());
         }
     }
 }

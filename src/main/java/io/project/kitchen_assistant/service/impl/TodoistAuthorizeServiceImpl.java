@@ -8,7 +8,6 @@ import io.project.kitchen_assistant.model.User;
 import io.project.kitchen_assistant.repository.UserRepository;
 import io.project.kitchen_assistant.service.StateService;
 import io.project.kitchen_assistant.service.TodoistAuthorizeService;
-import io.project.kitchen_assistant.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
@@ -29,26 +28,22 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
     private final RestTemplate restTemplateForGetTodoistToken;
     private final StateService stateService;
     private final UserRepository userRepository;
-    private final UserService userService;
     private final DataStorage authorizationCodeStorage;
 
     public TodoistAuthorizeServiceImpl(AppConfig appConfig, StateService stateService, UserRepository userRepository,
                                        @Qualifier("restTemplateForTodoist") RestTemplate restTemplateForGetTodoistToken,
-                                       UserService userService, DataStorage authorizationCodeStorage) {
+                                       DataStorage authorizationCodeStorage) {
         this.appConfig = appConfig;
         this.stateService = stateService;
         this.userRepository = userRepository;
         this.restTemplateForGetTodoistToken = restTemplateForGetTodoistToken;
-        this.userService = userService;
         this.authorizationCodeStorage = authorizationCodeStorage;
     }
 
     @Override
-    public String buildAuthUrl() {
+    public String buildAuthUrl(String email) {
         String state = UUID.randomUUID().toString();
         LocalDateTime ttl = LocalDateTime.now().plusHours(1);
-
-        String email = userService.getCurrentUser(); // User is not authenticated
 
         log.info("Saving State begins");
         stateService.saveState(state, "in_progress", ttl, email);
@@ -60,16 +55,13 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
                 .queryParam("state", state)
                 .build();
 
-        log.info("Redirecting to: {}", uriComponents.toUriString()); // позже убрать из лога URI
+        log.info("The redirect to the Todoist service begins..");
 
         return uriComponents.toUriString();
     }
 
     @Override
     public TodoistToken exchangeToken(String code, String email) {
-
-//        String email = userService.getCurrentUser(); // Internal Server Error: User is not authenticated
-
         authorizationCodeStorage.save(email, code);
 
         ResponseEntity<TodoistToken> responseEntity = restTemplateForGetTodoistToken.exchange

@@ -219,7 +219,10 @@
                         },
                         success: function(userInfo) {
                             const firstName = userInfo.firstName; // Предполагается, что ваш API возвращает имя пользователя
+                            const userId = userInfo.id; // ID пользователя
+
                             localStorage.setItem('username', firstName); // Сохраняем firstName в localStorage
+                            localStorage.setItem('userId', userId); // Сохраняем userId в localStorage
 
                             $("#message").text('Успешный вход!');
 

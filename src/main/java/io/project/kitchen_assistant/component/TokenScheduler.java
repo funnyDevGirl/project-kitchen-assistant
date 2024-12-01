@@ -13,9 +13,19 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
 import static java.lang.String.format;
 
+/**
+ * {@code TokenScheduler} - класс, предназначенный для периодического обновления
+ * токена доступа с помощью внешнего API.
+ *
+ * <p>
+ * Этот компонент использует механизм планирования задач Spring для
+ * автоматического получения нового токена доступа из API, обеспечивая актуальность
+ * токена. Он запускает процесс получения токена через фиксированные интервалы,
+ * позволяя другим компонентам приложения использовать действующий токен.
+ * </p>
+ */
 @Slf4j
 @EnableScheduling
 @Component
@@ -24,11 +34,28 @@ public class TokenScheduler {
     private final AppConfig appConfig;
     private final RestTemplate restTemplateGptTokenApi;
 
+    /**
+     * Конструктор класса {@code TokenScheduler}.
+     *
+     * @param appConfig конфигурация приложения, содержащая информацию о токенах и API.
+     * @param restTemplateGptTokenApi {@link RestTemplate}, используемый для обмена данными с API для получения токена.
+     */
     public TokenScheduler(AppConfig appConfig, @Qualifier("restTemplateForGpt") RestTemplate restTemplateGptTokenApi) {
         this.appConfig = appConfig;
         this.restTemplateGptTokenApi = restTemplateGptTokenApi;
     }
 
+    /**
+     * Запланированный метод для периодического получения нового токена доступа.
+     *
+     * <p>
+     * Этот метод вызывается с заданным фиксированным интервалом,
+     * определяемым {@link ApplicationConstants#TOKEN_REFRESH_RATE_3_HOURS}.
+     * Если новый токен успешно получен, он обновляет конфигурацию приложения и
+     * записывает в лог сообщение об успешном обновлении. В противном случае
+     * записывается сообщение об ошибке.
+     * </p>
+     */
     @Scheduled(fixedRate = ApplicationConstants.TOKEN_REFRESH_RATE_3_HOURS)
     public void scheduleFetchNewAccessToken() {
         String token = fetchNewAccessToken();
@@ -41,6 +68,18 @@ public class TokenScheduler {
         }
     }
 
+    /**
+     * Получает новый токен доступа из YandexGPT API.
+     *
+     * <p>
+     * Этот метод выполняет HTTP-запрос к внешнему API для получения токена доступа.
+     * Обрабатывает ошибки сетевого подключения и логирует информацию об успешности
+     * операции. Возвращает токен в формате "Bearer \<token\>", либо {@code null},
+     * если получение токена не удалось.
+     * </p>
+     *
+     * @return токен доступа в виде строки, или {@code null} в случае ошибки.
+     */
     public String fetchNewAccessToken() {
         String token = null;
 
