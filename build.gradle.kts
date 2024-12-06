@@ -15,7 +15,7 @@ group = "io.project.kitchen_assistant"
 version = "0.0.1-SNAPSHOT"
 
 application {
-	mainClass.set("io.project.kitchen_assistant.AppApplication")
+	mainClass.set("io.project.kitchen_assistant.Application")
 }
 
 checkstyle {
@@ -45,24 +45,49 @@ dependencies {
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+	implementation("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.6.8")
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+
+	implementation("org.slf4j:slf4j-api:2.0.16")
+	implementation("ch.qos.logback:logback-classic:1.5.8")
+	implementation("ch.qos.logback:logback-core:1.5.8")
 
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.commonmark:commonmark:0.18.2")
+	implementation("org.jsoup:jsoup:1.15.3")
+
+	testImplementation ("org.testcontainers:testcontainers:1.20.1")
+	testImplementation("org.testcontainers:junit-jupiter:1.20.1")
+	testImplementation("org.testcontainers:postgresql:1.20.2")
+	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
+	testImplementation("org.mockito:mockito-core:5.5.0")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0")
+	implementation("javax.validation:validation-api:1.0.0.GA")
+	testImplementation("io.github.hakky54:logcaptor:2.10.0")
+
+	testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
+	implementation("org.wiremock.integrations.testcontainers:wiremock-testcontainers-module:1.0-alpha-13")
+	implementation("org.springframework.cloud:spring-cloud-contract-wiremock:4.1.4")
 }
 
 
 tasks.withType<Test>() {
+	systemProperty("file.encoding", "utf-8")
 	finalizedBy(tasks.jacocoTestReport)
 	useJUnitPlatform()
 	testLogging {
@@ -70,6 +95,10 @@ tasks.withType<Test>() {
 		events = mutableSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
 		showStandardStreams = true
 	}
+}
+
+tasks.withType<JavaCompile> {
+	options.encoding = "UTF-8"
 }
 
 tasks.jacocoTestReport {

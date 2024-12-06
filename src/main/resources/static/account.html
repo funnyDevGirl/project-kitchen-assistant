@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Личный кабинет</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    #navbar {
+        padding: 20px 40px; /* Добавляем отступы для ширины навигации */
+    }
+
+    #navbar .nav-link {
+        color: white !important; /* Белый цвет для навигационных ссылок */
+        text-decoration: none; /* Без подчеркивания */
+        transition: background-color 0.3s ease; /* Плавный переход фона */
+        padding: 8px 12px; /* Отступы для удобного клика */
+    }
+
+    /* Эффект затемнения при наведении */
+    #navbar .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный серый фон при наведении */
+    }
+
+    #navbar .navbar-brand {
+        color: white !important; /* Белый цвет для названия сайта */
+    }
+
+    .slogan {
+        font-size: 1rem; /* Уменьшаем размер шрифта слогана */
+        font-weight: bold; /* Делаем жирным */
+        font-style: italic; /* Делаем курсивом */
+        padding: 5px; /* Отступы вокруг текста */
+        border-top: 1px solid rgba(255, 255, 255, 0.3); /* Верхняя линия */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Нижняя линия */
+        margin: 0; /* Удаляем внешние отступы, если они есть */
+        margin-bottom: 10px; /* Добавляем отступ снизу */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Тень текста */
+    }
+  </style>
+
+</head>
+<body>
+<!-- Навигационный блок -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
+<a class="navbar-brand" href="/">Kitchen Assistant</a>
+<a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
+<a id="viewRecipes" class="nav-link ml-2" href="/favorites.html">Избранные рецепты</a>
+<div class="ml-auto">
+  <button id="logoutBtn" class="btn btn-danger ml-2">Выйти</button>
+</div>
+</nav>
+
+<div class="bg-dark text-white text-center py-2">
+  <span class="slogan">Находите рецепты за секунды – готовьте с удовольствием!</span>
+</div>
+
+
+<div class="container mt-5">
+  <h4 id="greeting">Привет, <span id="userFirstName"></span>!</h4>
+  <div class="mt-4">
+    <a href="#" class="btn btn-primary" id="editProfileBtn">Редактировать профиль</a>
+    <a href="#" class="btn btn-danger ml-2" id="deleteProfileBtn">Удалить профиль</a>
+  </div>
+</div>
+
+<!-- Модальное окно для редактирования профиля -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProfileModalLabel">Редактировать профиль</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editProfileForm">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="firstName">Имя</label>
+            <input type="text" id="firstName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Фамилия</label>
+            <input type="text" id="lastName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" class="form-control" required minlength="3">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+        <button type="button" class="btn btn-primary" id="saveProfileChanges">Сохранить изменения</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(document).ready(function() {
+
+    const token = localStorage.getItem('jwt-token');
+    const username = localStorage.getItem('username');
+    const userId = localStorage.getItem('userId');
+
+    if (!token && !username) { // вместо ||
+        window.location.href = "/"; // Перенаправить на страницу входа
+        return;
+    }
+
+    // Заполняем имя пользователя из localStorage
+    $("#userFirstName").text(username);
+
+    // Исправляем заголовки для авторизации
+    const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+
+    // Открытие модального окна для редактирования профиля
+    $("#editProfileBtn").click(function() {
+
+        // Считываем текущие данные пользователя
+        $.get(`/api/v1/users/${userId}`, { headers: headers }, function(data) {
+            $("#email").val(data.email);
+            $("#firstName").val(data.firstName);
+            $("#lastName").val(data.lastName);
+            // Установка текущего пароля не рекомендуется по соображениям безопасности; пользователю нужно будет ввести пароль заново.
+            $("#editProfileModal").modal('show'); // Показываем модальное окно
+        });
+    });
+
+    // Сохранение изменений профиля
+    $("#saveProfileChanges").click(function() {
+        const userUpdateData = {
+            email: $("#email").val(),
+            firstName: $("#firstName").val(),
+            lastName: $("#lastName").val(),
+            password: $("#password").val()
+        };
+
+        $.ajax({
+            url: `/api/v1/users/${userId}`,
+            type: 'PUT',
+            headers: headers,
+            data: JSON.stringify(userUpdateData),
+            success: function(response) {
+                alert("Профиль успешно обновлен!");
+                $("#editProfileModal").modal('hide'); // Закрываем модальное окно
+
+                // Обновление имени в localStorage
+                localStorage.setItem('username', userUpdateData.firstName);
+                $("#userFirstName").text(userUpdateData.firstName); // Обновляем отображение имени на экране
+
+            },
+            error: function(xhr) {
+                alert("Ошибка при обновлении профиля: " + xhr.responseText);
+            }
+        });
+    });
+
+    // Обработка события на кнопке "Удалить профиль"
+    $("#deleteProfileBtn").click(function(e) {
+        e.preventDefault(); // Предотвращаем переход по ссылке
+
+        if (confirm("Вы уверены, что хотите удалить свой профиль? Это действие необратимо.")) {
+            $.ajax({
+                url: `/api/v1/users/${userId}`,
+                type: 'DELETE',
+                headers: headers,
+                success: function() {
+                    alert("Профиль успешно удалён!");
+                    // Перенаправление на главную страницу или выполнение другой логики
+
+                    localStorage.removeItem('jwt-token');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('username');
+
+                    window.location.href = '/';
+                },
+                error: function(xhr) {
+                    alert("Ошибка при удалении профиля: " + xhr.responseText);
+                }
+            });
+        }
+    });
+
+
+  // Обработка выхода
+  $("#logoutBtn").click(function() {
+      localStorage.removeItem('jwt-token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      window.location.href = '/'; // Переход на главную страницу
+  });
+});
+</script>
+</body>
+</html>

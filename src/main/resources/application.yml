@@ -1,5 +1,4 @@
 ---
-
 spring:
   jpa:
     generate-ddl: true
@@ -7,22 +6,52 @@ spring:
     hibernate:
       ddl-auto: create
 
+  http:
+    encoding:
+      enabled: true
+      charset: UTF-8
+      force: true
+
   output:
     ansi:
       enabled: always
-  instancio:
-    bean:
-      validation:
-        enabled: true
+
   sql:
     init:
       mode: always
   profiles:
-    default: development
+    default: dev
+
+  security:
+    oauth2:
+      client:
+        registration:
+          todoist:
+            client-id: ${TODOIST_CLIENT_ID}
+            client-secret: ${TODOIST_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            scope: data:read_write,data:delete
+            redirect-uri: https://localhost:8080/api/v1/auth/callback
+        provider:
+          todoist:
+            authorization-uri: https://todoist.com/oauth/authorize
+            token-uri: https://todoist.com/oauth/access_token
 
 logging:
   level:
     root: INFO
 
-#api-key: "0b2ab6b48232380993de3417b192018c"
-#api-id: "7f2b3458"
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
+
+# получение token для запросов к YandexGPT:
+JWT_TOKEN: ${JWT_TOKEN}
+gpt-token-url: "https://iam.api.cloud.yandex.net/iam/v1/tokens"
+
+# данные для YandexGPT:
+FOLDER_ID: ${GPT_FOLDER_ID}
+gpt-api-url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+
+# данные для создания задач в Todoist:
+todoist-tasks-api-url: "https://api.todoist.com/rest/v2/tasks"

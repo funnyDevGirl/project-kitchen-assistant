@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Избранные рецепты</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <style>
+        #navbar {
+            padding: 20px 40px; /* Добавляем отступы для ширины навигации */
+        }
+
+        #navbar .nav-link {
+            color: #ffffff !important; /* Формируем белый цвет для навигационных ссылок */
+            text-decoration: none; /* Без подчеркивания */
+            transition: background-color 0.3s ease; /* Плавный переход фона */
+            padding: 8px 12px; /* Отступы для добавления области щелчка */
+        }
+
+        /* Эффект затемнения при наведении */
+        #navbar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный белый фон при наведении */
+        }
+
+        /* Цвет для бренда */
+        #navbar .navbar-brand {
+            color: white !important; /* Белый цвет для названия сайта */
+        }
+
+        /* Эффект затемнения на бренде */
+        #navbar .navbar-brand:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Полупрозрачный фон при наведении на бренд */
+        }
+
+        .recipe-item { cursor: pointer; transition: border 0.2s; }
+
+        .recipe-item.selected {
+            border: 2px solid #007bff; /* Цвет рамки при выделении */
+            background-color: rgba(0, 123, 255, 0.1); /* Цвет фона при выделении */
+        }
+
+        #createShoppingListBtn {
+            display: none; /* Изначально скрыта */
+        }
+
+        .modal {
+        background: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+        }
+
+        .modal-dialog {
+            max-width: 300px; /* Уменьшаем ширину окна */
+            margin: auto; /* Центрируем окно */
+            margin-top: 100px; /* Увеличьте значение для перемещения ниже */
+        }
+
+        .modal-content {
+            border: none; /* Убираем границы */
+            border-radius: .5rem; /* Не забываем про небольшие закругления*/
+        }
+
+        .modal-body {
+            padding: 15px; /* Установим отступы */
+        }
+
+        .modal-footer {
+            border-top: none; /* Убираем границу сверху (между сообщением и кнопкой) */
+            padding: 0; /* Убираем внутренние отступы */
+        }
+
+        .slogan {
+            font-size: 1rem; /* Уменьшаем размер шрифта слогана */
+            font-weight: bold; /* Делаем жирным */
+            font-style: italic; /* Делаем курсивом */
+            padding: 5px; /* Отступы вокруг текста */
+            border-top: 1px solid rgba(255, 255, 255, 0.3); /* Верхняя линия */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Нижняя линия */
+            margin: 0; /* Удаляем внешние отступы, если они есть */
+            margin-bottom: 10px; /* Добавляем отступ снизу */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Тень текста */
+        }
+
+        .custom-badge {
+            font-size: 1rem; /* Увеличиваем размер шрифта */
+            padding: 0.3em 0.8em; /* Увеличиваем внутренние отступы */
+            margin: 0.2rem; /* Отступы между метками */
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
+    <a class="navbar-brand" href="/">Kitchen Assistant</a>
+    <a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
+    <div class="ml-auto">
+        <button id="profileBtn" class="btn btn-primary ml-2">Личный кабинет</button>
+        <button id="logoutBtn" class="btn btn-danger ml-2">Выйти</button>
+    </div>
+</nav>
+
+<div class="bg-dark text-white text-center py-2">
+    <span class="slogan">Находите рецепты за секунды – готовьте с удовольствием!</span>
+</div>
+
+<div class="container mt-5">
+    <h3>Избранные рецепты</h3>
+
+    <p><button id="createShoppingListBtn" class="btn btn-primary mt-3">Сформировать список покупок в Todoist</button></p>
+
+    <div id="results"></div>
+
+    <div id="taskForm" style="display:none;">
+        <h4>Создание задачи</h4>
+        <form id="createTask">
+            <div class="form-group">
+                <label for="taskContent">Список ингредиентов:</label>
+                <textarea class="form-control" id="taskContent" rows="3" readonly></textarea>
+            </div>
+            <div class="form-group">
+                <label for="taskDescription">Описание:</label>
+                <input type="text" class="form-control" id="taskDescription" required>
+            </div>
+            <div class="form-group">
+                <label>Метки:</label>
+                <div id="taskLabelsContainer" class="mb-2">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="taskDueDate">Дата выполнения:</label>
+                <input type="date" class="form-control" id="taskDueDate">
+            </div>
+            <div class="form-group">
+                <label for="taskDueString">Дополнительная информация:</label>
+                <input type="text" class="form-control" id="taskDueString">
+            </div>
+
+            <p><button type="submit" class="btn btn-success">Создать задачу</button>
+            <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button></p>
+
+        </form>
+    </div>
+</div>
+
+<!-- Пример модального окна -->
+<div class="modal" id="alertModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center">
+            <div class="modal-body">
+                <p id="alertMessage">Сообщение по умолчанию</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" onclick="window.open('https://todoist.com', '_blank')">Перейти в Todoist</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        const token = localStorage.getItem('jwt-token');
+        const username = localStorage.getItem('username');
+
+        // Обновляем текст на кнопке "Личный кабинет"
+        $("#profileBtn").text(username);
+
+        // Загружаем все рецепты при загрузке страницы
+        $.ajax({
+            url: '/api/v1/recipes',
+            type: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            contentType: 'application/json',
+            success: function(recipes) {
+                $("#results").empty(); // Очищаем предыдущие результаты
+
+                if (recipes.length > 0) {
+                    recipes.forEach(function(recipe) {
+                        let recipeHtml = `
+                        <div class="card mb-4 recipe-item" data-recipe='${JSON.stringify(recipe)}'> <!-- Добавлено data-recipe -->
+                            <div class="card-body">
+                                <h4 class="card-title">${recipe.name}</h4>
+                                <p class="card-text"><strong>Ингредиенты:</strong> ${recipe.ingredients.join(', ')}</p>
+                                <p class="card-text"><strong>Приготовление:</strong> ${recipe.instructions}</p>
+
+                                <button class="delete-btn btn btn-danger" style="display: none;">
+                                    <i class="fas fa-trash-alt"></i> Удалить
+                                </button>
+
+                            </div>
+                        </div>
+                        `;
+                        $("#results").append(recipeHtml);
+                    });
+                } else {
+                    $("#results").append('<div class="alert alert-info">Вы ещё не добавили ни одного рецепта.</div>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Произошла ошибка: " + error);
+                $("#results").append('<div class="alert alert-danger">Произошла ошибка при загрузке избранных рецептов.</div>');
+            }
+        });
+
+
+        // Выбор рецептов через клик
+        $(document).on('click', '.recipe-item', function() {
+            $(this).toggleClass('selected');
+
+            const deleteBtn = $(this).find('.delete-btn');
+            deleteBtn.toggle($(this).hasClass('selected')); // Показываем/скрываем кнопку удаления в зависимости от выделения
+
+            updateShoppingListButtonVisibility();
+        });
+
+        // Функция для обновления видимости кнопки "Сформировать список покупок"
+        function updateShoppingListButtonVisibility() {
+            const selectedRecipesCount = $(".recipe-item.selected").length;
+            console.log(`Количество выделенных рецептов: ${selectedRecipesCount}`);
+
+            // Показываем кнопку "Сформировать список покупок" только если есть выделенные рецепты
+            if (selectedRecipesCount > 0) {
+                $("#createShoppingListBtn").show();
+            } else {
+                $("#createShoppingListBtn").hide();
+                $("#taskForm").hide();
+            }
+        }
+
+        // Обработка удаления рецептов
+        $(document).on('click', '.delete-btn', function(event) {
+            event.stopPropagation(); // Чтобы клик не сработал на родительский элемент
+
+            const recipeItem = $(this).closest('.recipe-item');
+            const recipeData = recipeItem.data('recipe');
+
+            $.ajax({
+                url: `/api/v1/recipes/${recipeData.id}`, // Предполагаем, что у рецепта есть поле id
+                type: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function() {
+                    recipeItem.remove(); // Удаляем рецепт из отображения
+
+                    // Сразу обновляем видимость кнопки после удаления рецепта
+                    updateShoppingListButtonVisibility();
+                    $("#taskForm").hide();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Произошла ошибка при удалении рецепта: " + error);
+                }
+            });
+        });
+
+        $("#createShoppingListBtn").click(function() {
+            const selectedRecipes = $(".recipe-item.selected");
+
+            console.log(selectedRecipes.length); // Выводим количество выделенных рецептов
+
+            // Если нет выделенных рецептов
+            if (selectedRecipes.length === 0) {
+
+                // Отобразить модальное окно с сообщением
+                $("#alertMessage").text("Пожалуйста, выберите хотя бы один рецепт.");
+                $("#alertModal").modal('show');
+
+                return; // Выходим, если нет выделенных рецептов
+            }
+
+            let ingredientsText = "";
+            let recipeNames = [];  // Массив для хранения названий выбранных рецептов
+            const labels = ["Food", "Shopping"]; // Предустановленные метки
+
+            selectedRecipes.each(function() {
+                const recipe = $(this).data('recipe');
+
+                // Выводим информацию о текущем элементе
+                console.log("Current element:", $(this)); // Выводим элемент
+                console.log("Recipe data:", recipe); // Выводим рецепт
+
+                // Проверка на наличие ингредиентов
+                if (recipe && Array.isArray(recipe.ingredients)) {
+
+                    ingredientsText += `${recipe.name}:\n`; // Добавляем имя рецепта и новую строку
+
+                    recipe.ingredients.forEach(ingredient => {
+                        ingredientsText += `${ingredient.trim()}\n`; // Добавляем каждый ингредиент в текстовом формате
+                    });
+
+                    recipeNames.push(recipe.name); // Сохраняем название рецепта для описания
+                } else {
+                    console.warn("Recipe does not have ingredients or is not an array", recipe);
+                }
+            });
+
+            if (ingredientsText) {
+                // Отображаем ингредиенты в виде списка
+                $("#taskContent").html(ingredientsText); // Вставляем список ингредиентов
+                $("#taskDescription").val(`Купить продукты для приготовления: ${recipeNames.join(', ')}`); // Устанавливаем строку в поле "Описание"
+
+                // Отображаем метки
+                let labelsHtml = labels.map(label => `<span class="badge badge-secondary custom-badge">${label}</span>`).join(' ');
+                $("#taskLabelsContainer").html(labelsHtml);  // Вставляем метки в контейнер
+
+                $("#taskForm").show();
+
+                // Установка текущей даты по умолчанию
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+                const day = String(today.getDate()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day}`;
+                $("#taskDueDate").val(formattedDate); // Устанавливаем в поле даты
+            } else {
+                // Отобразить модальное окно с сообщением
+                $("#alertMessage").text("Пожалуйста, выберите хотя бы один рецепт.");
+                $("#alertModal").modal('show');
+            }
+        });
+
+
+        // Переменная для хранения ссылки на маленькое окно
+        let smallWindow;
+
+        function handleUnauthorized() {
+            // Открываем новое окно с заданными размерами
+            const redirectUrl = `/api/v1/auth/authorize?data=${token}`;
+            smallWindow = window.open(redirectUrl, 'authorizeWindow', 'width=900,height=700');
+
+            if (smallWindow) {
+                // Если окно успешно открыто, скрываем формы
+                $("#taskForm").hide();
+                $("#createShoppingListBtn").hide(); // Скрыть кнопку после создания задачи
+                $(".recipe-item").removeClass('selected'); // Снять выделение с рецептов
+                $('.delete-btn').hide(); // Скрыть кнопку удаления
+
+                window.opener.location.reload(); // Обновляем родительское окно
+
+            } else {
+                // Если окно не открылось (например, блокировщик всплывающих окон)
+                $("#alertMessage").text("Не удалось открыть окно авторизации. Пожалуйста, проверьте настройки вашего браузера.");
+                $("#alertModal").modal('show');
+            }
+        }
+
+        $("#createTask").submit(function(event) {
+            event.preventDefault();
+
+            const taskRequest = {
+                content: $("#taskContent").val(),
+                description: $("#taskDescription").val(),
+                labels: ["Food", "Shopping"],
+                dueDate: $("#taskDueDate").val(),
+                dueString: $("#taskDueString").val()
+            };
+
+            $.ajax({
+                url: '/api/v1/tasks',
+                type: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                contentType: 'application/json',
+                data: JSON.stringify(taskRequest),
+                success: function(response) {
+
+                    // Отобразить модальное окно с сообщением
+                    $("#alertMessage").text("Задача успешно создана!");
+
+                    // Добавляем обработчик события закрытия модального окна
+                    $('#alertModal').on('hidden.bs.modal', function () {
+                      window.location.href = '/';
+                    });
+
+                    // Показываем модальное окно
+                    $("#alertModal").modal('show');
+
+                    // Скрываем форму задачи
+                    $("#taskForm").hide();
+                    $("#createShoppingListBtn").hide();
+                    $(".recipe-item").removeClass('selected');
+                    $('.delete-btn').hide();
+
+                    // Сброс формы
+                    $("#taskForm")[0].reset();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Ошибка при создании задачи: " + error);
+
+                    if (xhr.status === 401) {
+                       handleUnauthorized();
+
+                    } else {
+                        console.error("Ошибка при создании задачи: " + error);
+
+                        // Отобразить модальное окно с сообщением
+                        $("#alertMessage").text("Произошла ошибка при создании задачи.");
+                        $("#alertModal").modal('show');
+                    }
+
+                }
+            });
+        });
+
+
+        $("#cancelBtn").click(function() {
+            $("#taskForm").hide();
+        });
+
+        // Обработка перехода в личный кабинет
+        $("#profileBtn").click(function() {
+            const userId = localStorage.getItem('userId');
+            window.location.href = `/account.html`; // Переход на страницу профиля
+        });
+
+        $("#searchRecipesBtn").click(function() {
+            window.location.href = '/'; // Переход на главную страницу
+        });
+
+        // Обработка выхода
+        $("#logoutBtn").click(function() {
+            localStorage.removeItem('jwt-token');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+
+            $("#navbar").hide(); // Скрыть навигационный блок
+            $("#loginContainer").show(); // Показать форму логина
+            $("#searchContainer").hide(); // Скрыть строку поиска
+            window.location.href = '/'; // Переход на главную страницу
+        });
+    });
+</script>
+</body>
+</html>
+
+
