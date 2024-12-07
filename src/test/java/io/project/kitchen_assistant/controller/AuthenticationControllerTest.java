@@ -1,6 +1,7 @@
 package io.project.kitchen_assistant.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.project.kitchen_assistant.container.PostgresContainerManager;
 import io.project.kitchen_assistant.dto.users.AuthRequest;
 import io.project.kitchen_assistant.dto.users.UserModificationDTO;
 import io.project.kitchen_assistant.mapper.UserMapper;
@@ -14,15 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
@@ -44,15 +45,8 @@ public class AuthenticationControllerTest {
 
     private User testUser;
 
-    private static final PostgreSQLContainer<?> postgresContainer =
-            new PostgreSQLContainer<>("postgres:latest")
-                    .withDatabaseName("test_db")
-                    .withUsername("test")
-                    .withPassword("test");
-
-    static {
-        postgresContainer.start();
-    }
+    private final PostgreSQLContainer<?> POSTGRES_CONTAINER =
+            PostgresContainerManager.getContainer();
 
     @BeforeEach
     public void setUp() {

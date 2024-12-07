@@ -5,6 +5,7 @@ import io.project.kitchen_assistant.dto.users.UserModificationDTO;
 import io.project.kitchen_assistant.exception.UserNotFoundException;
 import io.project.kitchen_assistant.mapper.UserMapper;
 import io.project.kitchen_assistant.model.User;
+import io.project.kitchen_assistant.repository.RecipeRepository;
 import io.project.kitchen_assistant.repository.UserRepository;
 import io.project.kitchen_assistant.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,15 +15,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.List;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
 
     @Mock
     private UserRepository mockUserRepository;
+
+    @Mock
+    private RecipeRepository mockRecipeRepository;
 
     @Mock
     private UserMapper mockUserMapper;
@@ -108,17 +119,18 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testDeleteUser() {
+    void testDeleteUserWithNoRecipesShouldDeleteUserAndRecipes() {
         // Arrange
         Long userId = 1L;
 
         when(mockUserRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(mockRecipeRepository.findAllByUser(user)).thenReturn(List.of());
 
         // Act
         userService.delete(userId);
 
         // Assert
-        verify(mockUserRepository).findById(userId);
+        verify(mockRecipeRepository).deleteAll(anyList());
         verify(mockUserRepository).deleteById(userId);
     }
 

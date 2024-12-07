@@ -1,8 +1,13 @@
 package io.project.kitchen_assistant.service;
 
+import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import io.project.kitchen_assistant.config.AppConfig;
 import io.project.kitchen_assistant.dto.todoist.tasks.TaskDTO;
 import io.project.kitchen_assistant.dto.todoist.tasks.TodoistTaskRequest;
@@ -27,7 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 public class TaskServiceImplTest {
@@ -51,7 +56,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testCreate_Success() {
+    public void testCreateSuccess() {
         TodoistTaskRequest taskRequest = new TodoistTaskRequest();
         taskRequest.setContent("Test Task");
         taskRequest.setLabels(List.of());
@@ -73,7 +78,7 @@ public class TaskServiceImplTest {
                 eq(TodoistTaskResponse.class)))
                 .thenReturn(ResponseEntity.ok(taskResponse));
 
-        TaskDTO expectedTaskDTO = new TaskDTO("12345","Test Task", "", due, List.of("Food", "Shopping"));
+        TaskDTO expectedTaskDTO = new TaskDTO("12345", "Test Task", "", due, List.of("Food", "Shopping"));
 
         when(taskMapper.toDTO(taskResponse)).thenReturn(expectedTaskDTO);
 
@@ -85,7 +90,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testCreate_ErrorResponse() {
+    public void testCreateErrorResponse() {
         TodoistTaskRequest taskRequest = new TodoistTaskRequest();
         taskRequest.setContent("Test Task");
 
@@ -99,7 +104,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testCreate_NullResponseBody() {
+    public void testCreateNullResponseBody() {
         TodoistTaskRequest taskRequest = new TodoistTaskRequest();
         taskRequest.setContent("Test Task");
 
@@ -113,7 +118,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testCreate_HttpClientErrorException() {
+    public void testCreateHttpClientErrorException() {
         TodoistTaskRequest taskRequest = new TodoistTaskRequest();
         taskRequest.setContent("Test Task");
 
@@ -127,7 +132,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testCreate_UnexpectedError() {
+    public void testCreateUnexpectedError() {
         TodoistTaskRequest taskRequest = new TodoistTaskRequest();
         taskRequest.setContent("Test Task");
 
@@ -141,9 +146,9 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testGetById_Success() {
+    public void testGetByIdSuccess() {
         String taskId = "12345";
-        String url = String.format("%s/%s", appConfig.getTodoistTasksApiUrl(), taskId);
+        String url = format("%s/%s", appConfig.getTodoistTasksApiUrl(), taskId);
 
         TodoistTaskResponse taskResponse = new TodoistTaskResponse();
         taskResponse.setId("12345");
@@ -169,9 +174,9 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testGetById_TaskNotFound() {
+    public void testGetByIdTaskNotFound() {
         String taskId = "12345";
-        String url = String.format("%s/%s", appConfig.getTodoistTasksApiUrl(), taskId);
+        String url = format("%s/%s", appConfig.getTodoistTasksApiUrl(), taskId);
 
         when(restTemplateTodoistApi.exchange(eq(url),
                 eq(HttpMethod.GET),
@@ -179,36 +184,41 @@ public class TaskServiceImplTest {
                 eq(TodoistTaskResponse.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        TaskNotFoundException exception = assertThrows(TaskNotFoundException.class, () -> taskServiceImpl.getById(taskId));
+        TaskNotFoundException exception = assertThrows(TaskNotFoundException.class,
+                () -> taskServiceImpl.getById(taskId));
         assertEquals("Task with ID 12345 not found.", exception.getMessage());
     }
 
     @Test
-    public void testGetById_BadRequest() {
+    public void testGetByIdBadRequest() {
         String taskId = "invalid_id";
-        String url = String.format("%s/%s", appConfig.getTodoistTasksApiUrl(), taskId);
+        String url = format("%s/%s", appConfig.getTodoistTasksApiUrl(), taskId);
 
         when(restTemplateTodoistApi.exchange(eq(url),
                 eq(HttpMethod.GET), isNull(), eq(TodoistTaskResponse.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> taskServiceImpl.getById(taskId));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> taskServiceImpl.getById(taskId));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("Invalid task ID provided: invalid_id", exception.getReason());
     }
 
     @Test
-    public void testGetById_UnexpectedError() {
+    public void testGetByIdUnexpectedError() {
         String taskId = "12345";
-        String url = String.format("%s/%s", appConfig.getTodoistTasksApiUrl(), taskId);
+        String url = format("%s/%s", appConfig.getTodoistTasksApiUrl(), taskId);
 
         when(restTemplateTodoistApi.exchange(eq(url),
                 eq(HttpMethod.GET), isNull(), eq(TodoistTaskResponse.class)))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> taskServiceImpl.getById(taskId));
-        assertEquals("Unexpected error occurred while receiving task: Unexpected error. java.lang.RuntimeException: Unexpected error",
-                exception.getMessage());
+        assertEquals(format("%s %s",
+                        "Unexpected error occurred while receiving task: Unexpected error.",
+                        "java.lang.RuntimeException: Unexpected error"),
+                exception.getMessage()
+        );
     }
 }
