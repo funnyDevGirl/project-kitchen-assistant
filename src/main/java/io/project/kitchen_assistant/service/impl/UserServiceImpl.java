@@ -4,13 +4,15 @@ import io.project.kitchen_assistant.dto.users.UserDTO;
 import io.project.kitchen_assistant.dto.users.UserModificationDTO;
 import io.project.kitchen_assistant.exception.UserNotFoundException;
 import io.project.kitchen_assistant.mapper.UserMapper;
+import io.project.kitchen_assistant.model.Recipe;
 import io.project.kitchen_assistant.model.User;
+import io.project.kitchen_assistant.repository.RecipeRepository;
 import io.project.kitchen_assistant.repository.UserRepository;
 import io.project.kitchen_assistant.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
+import java.util.List;
 import static java.lang.String.format;
 
 @Slf4j
@@ -20,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RecipeRepository recipeRepository;
 
     public UserDTO create(UserModificationDTO modificationDTO) {
         User user = userMapper.toUser(modificationDTO);
@@ -44,11 +47,14 @@ public class UserServiceImpl implements UserService {
     }
 
     public void delete(Long id) {
-        userRepository.findById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(format("User with id: '%s' not found", id)));
 
-        log.info("User with id '{}' successfully deleted", id);
+        List<Recipe> recipes = recipeRepository.findAllByUser(user);
+        recipeRepository.deleteAll(recipes);
 
         userRepository.deleteById(id);
+        log.info("User with id '{}' successfully deleted", id);
     }
 
     public UserDTO findById(Long id) {

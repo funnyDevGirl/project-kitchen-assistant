@@ -23,8 +23,13 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RecipeServiceImplTest {
 
@@ -86,7 +91,7 @@ public class RecipeServiceImplTest {
         when(recipeMapper.map(createDTO)).thenReturn(testRecipe);
         when(recipeRepository.save(testRecipe)).thenReturn(testRecipe);
 
-        RecipeDTO expectedRecipeDTO = new RecipeDTO(5L,"Пирог",
+        RecipeDTO expectedRecipeDTO = new RecipeDTO(5L, "Пирог",
                 List.of("форель - 500г", "лук - 200г", "тесто - любое"),
                 "Ингредиенты нарезать. Завернуть в тесто.");
 
@@ -99,7 +104,7 @@ public class RecipeServiceImplTest {
         assertNotNull(result);
         assertEquals(expectedRecipeDTO.getId(), result.getId());
         assertEquals(expectedRecipeDTO.getName(), result.getName());
-        verify(recipeRepository, times(1)).save(testRecipe);
+        verify(recipeRepository).save(testRecipe);
     }
 
     @Test
@@ -133,7 +138,7 @@ public class RecipeServiceImplTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(expectedRecipeDTO, result.getFirst());
-        verify(recipeRepository, times(1)).findAllByUserEmail(userEmail);
+        verify(recipeRepository).findAllByUserEmail(userEmail);
     }
 
     @Test
@@ -148,7 +153,7 @@ public class RecipeServiceImplTest {
         // Assert
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        verify(recipeRepository, times(1)).findAllByUserEmail(userEmail);
+        verify(recipeRepository).findAllByUserEmail(userEmail);
     }
 
     @Test
@@ -169,7 +174,7 @@ public class RecipeServiceImplTest {
         assertNotNull(result);
         assertEquals(expectedRecipeDTO.getId(), result.getId());
         assertEquals(expectedRecipeDTO.getName(), result.getName());
-        verify(recipeRepository, times(1)).findById(recipeId);
+        verify(recipeRepository).findById(recipeId);
     }
 
     @Test
@@ -194,7 +199,7 @@ public class RecipeServiceImplTest {
         recipeService.delete(recipeId);
 
         // Assert
-        verify(recipeRepository, times(1)).deleteById(recipeId);
+        verify(recipeRepository).deleteById(recipeId);
 
         List<String> logs = logCaptor.getInfoLogs();
         assertThat(logs).contains("Recipe with id '5' successfully deleted");

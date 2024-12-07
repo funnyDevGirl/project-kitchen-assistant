@@ -10,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.Optional;
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 public class CustomUserDetailsServiceTest {
@@ -25,7 +27,7 @@ public class CustomUserDetailsServiceTest {
     }
 
     @Test
-    public void testLoadUserByUsername_UserFound() {
+    public void testLoadUserByUsernameUserFound() {
         // Arrange
         String email = "test@example.com";
         User mockUser = Mockito.mock(User.class);
@@ -42,7 +44,7 @@ public class CustomUserDetailsServiceTest {
     }
 
     @Test
-    public void testLoadUserByUsername_UserNotFound() {
+    public void testLoadUserByUsernameUserNotFound() {
         // Arrange
         String email = "UserNotFound@example.com";
         when(mockUserRepository.findByEmail(email)).thenReturn(Optional.empty());

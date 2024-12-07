@@ -3,7 +3,8 @@ package io.project.kitchen_assistant.formatter;
 import io.project.kitchen_assistant.dto.recipes.RecipeCreateDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 public class RecipesParserTest {

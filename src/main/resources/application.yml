@@ -4,7 +4,7 @@ spring:
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
 
   http:
     encoding:
@@ -42,11 +42,11 @@ logging:
     root: INFO
 
 rsa:
-  private-key: classpath:certs/private.pem
-  public-key: classpath:certs/public.pem
+  private-key: ${PRIVATE_KEY}
+  public-key: ${PUBLIC_KEY}
 
 # получение token для запросов к YandexGPT:
-JWT_TOKEN: ${JWT_TOKEN}
+JWT_TOKEN: ${GPT_JWT_TOKEN}
 gpt-token-url: "https://iam.api.cloud.yandex.net/iam/v1/tokens"
 
 # данные для YandexGPT:

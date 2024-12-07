@@ -10,10 +10,7 @@ test:
 report:
 	./gradlew jacocoTestReport
 
-dev:
-	./gradlew run
-
-prod:
-	./gradlew bootRun --args='--spring.profiles.active=prod'
+run:
+	./gradlew bootRun
 
 .PHONY: build

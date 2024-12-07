@@ -10,7 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 public class UserUtilsTest {
@@ -65,7 +68,7 @@ public class UserUtilsTest {
         when(mockUserRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Mock Authentication
-        Authentication mockAuthentication = new UsernamePasswordAuthenticationToken(userEmail, null,List.of());
+        Authentication mockAuthentication = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
         SecurityContextHolder.getContext().setAuthentication(mockAuthentication);
 
         // Act

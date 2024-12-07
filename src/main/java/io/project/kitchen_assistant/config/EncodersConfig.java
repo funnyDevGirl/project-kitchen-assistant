@@ -30,14 +30,17 @@ public class EncodersConfig {
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(rsaKeys.getPublicKey()).privateKey(rsaKeys.getPrivateKey()).build();
+        JWK jwk = new RSAKey.Builder(rsaKeys.getRsaPublicKey())
+                .privateKey(rsaKeys.getRsaPrivateKey())
+                .build();
+
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(rsaKeys.getPublicKey()).build();
+        return NimbusJwtDecoder.withPublicKey(rsaKeys.getRsaPublicKey()).build();
     }
 
 }

@@ -1,6 +1,7 @@
 package io.project.kitchen_assistant.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.project.kitchen_assistant.container.PostgresContainerManager;
 import io.project.kitchen_assistant.dto.users.UserDTO;
 import io.project.kitchen_assistant.dto.users.UserModificationDTO;
 import io.project.kitchen_assistant.mapper.UserMapper;
@@ -14,19 +15,23 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
+@ActiveProfiles("test")
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -44,15 +49,8 @@ public class UserControllerTest {
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
-    private static final PostgreSQLContainer<?> postgresContainer =
-            new PostgreSQLContainer<>("postgres:latest")
-                    .withDatabaseName("test_db")
-                    .withUsername("test")
-                    .withPassword("test");
-
-    static {
-        postgresContainer.start();
-    }
+    private final PostgreSQLContainer<?> POSTGRES_CONTAINER =
+            PostgresContainerManager.getContainer();
 
     @BeforeEach
     public void setUp() {
