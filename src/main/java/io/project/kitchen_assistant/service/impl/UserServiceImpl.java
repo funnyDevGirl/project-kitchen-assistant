@@ -15,6 +15,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import static java.lang.String.format;
 
+/**
+ * Реализация сервиса для управления пользователями.
+ * <p>
+ * Этот класс отвечает за создание, обновление, удаление и поиск пользователей в системе.
+ * Он использует репозитории и мапперы для взаимодействия с данными.
+ * </p>
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -24,6 +31,12 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RecipeRepository recipeRepository;
 
+    /**
+     * Создает нового пользователя.
+     *
+     * @param modificationDTO объект, содержащий данные для создания пользователя
+     * @return объект UserDTO, представляющий созданного пользователя
+     */
     public UserDTO create(UserModificationDTO modificationDTO) {
         User user = userMapper.toUser(modificationDTO);
 
@@ -34,6 +47,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(savedUser);
     }
 
+    /**
+     * Обновляет данные существующего пользователя.
+     *
+     * @param modificationDTO объект, содержащий новые данные пользователя
+     * @param id идентификатор пользователя, данные которого нужно обновить
+     * @return объект UserDTO, представляющий обновленного пользователя
+     * @throws UserNotFoundException если пользователь с указанным идентификатором не найден
+     */
     public UserDTO update(UserModificationDTO modificationDTO, Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(format("User with id: '%s' not found", id)));
@@ -46,6 +67,12 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(updatedUser);
     }
 
+    /**
+     * Удаляет пользователя по его идентификатору.
+     *
+     * @param id идентификатор пользователя, которого нужно удалить
+     * @throws UserNotFoundException если пользователь с указанным идентификатором не найден
+     */
     public void delete(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(format("User with id: '%s' not found", id)));
@@ -57,6 +84,13 @@ public class UserServiceImpl implements UserService {
         log.info("User with id '{}' successfully deleted", id);
     }
 
+    /**
+     * Ищет пользователя по его идентификатору.
+     *
+     * @param id идентификатор пользователя
+     * @return объект UserDTO, представляющий найденного пользователя
+     * @throws UserNotFoundException если пользователь с указанным идентификатором не найден
+     */
     public UserDTO findById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(format("User with id: '%s' not found", id)));
@@ -64,6 +98,13 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user);
     }
 
+    /**
+     * Ищет пользователя по его электронной почте.
+     *
+     * @param email адрес электронной почты пользователя
+     * @return объект UserDTO, представляющий найденного пользователя
+     * @throws UserNotFoundException если пользователь с указанной электронной почтой не найден
+     */
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(format("User with email: '%s' not found", email)));

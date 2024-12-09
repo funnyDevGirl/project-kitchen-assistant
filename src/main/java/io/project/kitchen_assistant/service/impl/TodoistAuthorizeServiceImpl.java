@@ -20,6 +20,15 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import static java.lang.String.format;
 
+/**
+ * Реализация сервиса для авторизации пользователей в Todoist.
+ * <p>
+ * Этот класс управляет процессом авторизации, включая построение URL для
+ * авторизации, получения кода и состояния из параметров после авторизации
+ * и обмен кода на токен доступа. Он также сохраняет состояние
+ * и обновляет информацию о пользователе.
+ * </p>
+ */
 @Slf4j
 @Service
 public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
@@ -40,6 +49,12 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
         this.authorizationCodeStorage = authorizationCodeStorage;
     }
 
+    /**
+     * Формирует URL для авторизации пользователя в Todoist.
+     *
+     * @param email адрес электронной почты пользователя
+     * @return строка, представляющая URL для авторизации
+     */
     @Override
     public String buildAuthUrl(String email) {
         String state = UUID.randomUUID().toString();
@@ -60,6 +75,14 @@ public class TodoistAuthorizeServiceImpl implements TodoistAuthorizeService {
         return uriComponents.toUriString();
     }
 
+    /**
+     * Обменивает код авторизации на токен доступа.
+     *
+     * @param code код авторизации, полученный от Todoist
+     * @param email адрес электронной почты пользователя, которому принадлежит код
+     * @return объект TodoistToken, представляющий токен доступа
+     * @throws RuntimeException если не удалось обменять код на токен
+     */
     @Override
     public TodoistToken exchangeToken(String code, String email) {
         authorizationCodeStorage.save(email, code);

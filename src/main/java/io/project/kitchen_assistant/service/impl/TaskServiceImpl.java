@@ -24,6 +24,13 @@ import java.util.List;
 import java.util.Optional;
 import static java.lang.String.format;
 
+/**
+ * Реализация сервиса для управления задачами.
+ * <p>
+ * Этот класс предоставляет методы для создания, получения, обновления и удаления задач на основе API Todoist.
+ * Он использует маппер для преобразования данных между различными форматами.
+ * </p>
+ */
 @Slf4j
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -39,6 +46,13 @@ public class TaskServiceImpl implements TaskService {
         this.restTemplateTodoistApi = restTemplateTodoistApi;
     }
 
+    /**
+     * Создает новую задачу в Todoist.
+     *
+     * @param taskRequest объект, представляющий данные для создания задачи
+     * @return объект TaskDTO, представляющий созданную задачу
+     * @throws IllegalArgumentException если не удалось создать задачу с переданными данными
+     */
     public TaskDTO create(TodoistTaskRequest taskRequest) {
         addDefaultLabels(taskRequest);
         ResponseEntity<TodoistTaskResponse> responseEntity = exchangeForPost(taskRequest);
@@ -55,6 +69,14 @@ public class TaskServiceImpl implements TaskService {
                         format("Check the request data. Failed to create a task with data: %s", taskRequest)));
     }
 
+    /**
+     * Выполняет POST запрос для создания задачи на Todoist API.
+     *
+     * @param taskRequest объект, представляющий данные задачи для создания
+     * @return ResponseEntity с ответом от API
+     * @throws ResponseStatusException в случае HTTP ошибок при создании задачи
+     * @throws RuntimeException в случае других неожиданных ошибок
+     */
     private ResponseEntity<TodoistTaskResponse> exchangeForPost(TodoistTaskRequest taskRequest) {
         try {
             return restTemplateTodoistApi.exchange(
@@ -74,6 +96,13 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    /**
+     * Получает задачу по её уникальному идентификатору.
+     *
+     * @param id уникальный идентификатор задачи
+     * @return объект TaskDTO, представляющий найденную задачу
+     * @throws IllegalArgumentException если ответ от API не содержит задачи
+     */
     public TaskDTO getById(String id) {
         String url = format("%s/%s", appConfig.getTodoistTasksApiUrl(), id);
         ResponseEntity<TodoistTaskResponse> response = exchangeForGet(id, url);
@@ -83,6 +112,16 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new IllegalArgumentException("Task response must not be null"));
     }
 
+    /**
+     * Выполняет GET запрос для получения задачи по идентификатору.
+     *
+     * @param id уникальный идентификатор задачи
+     * @param url URL запроса
+     * @return ResponseEntity с ответом от API
+     * @throws TaskNotFoundException если задача не найдена
+     * @throws ResponseStatusException если ID задачи недействителен
+     * @throws RuntimeException в случае других неожиданных ошибок
+     */
     private ResponseEntity<TodoistTaskResponse> exchangeForGet(String id, String url) {
         try {
             return restTemplateTodoistApi.exchange(url, HttpMethod.GET, null, TodoistTaskResponse.class);
@@ -103,6 +142,11 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    /**
+     * Получает все задачи.
+     *
+     * @return список объектов TaskDTO, представляющих все задачи
+     */
     public List<TaskDTO> getAll() {
         ResponseEntity<TodoistTaskResponse[]> responseEntity = exchangeForGetAll();
 
@@ -119,6 +163,13 @@ public class TaskServiceImpl implements TaskService {
                 });
     }
 
+    /**
+     * Выполняет GET запрос для получения всех задач.
+     *
+     * @return ResponseEntity с массивом задач
+     * @throws ResponseStatusException в случае HTTP ошибок при получении задач
+     * @throws RuntimeException в случае других неожиданных ошибок
+     */
     private ResponseEntity<TodoistTaskResponse[]> exchangeForGetAll() {
         try {
             return restTemplateTodoistApi.exchange(
@@ -137,6 +188,12 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    /**
+     * Удаляет задачу по её уникальному идентификатору.
+     *
+     * @param id уникальный идентификатор задачи для удаления
+     * @throws ResponseStatusException если удаление задачи завершилось неудачно
+     */
     public void delete(String id) {
         String url = format("%s/%s", appConfig.getTodoistTasksApiUrl(), id);
         ResponseEntity<Void> responseEntity = exchangeForDelete(id, url);
@@ -149,6 +206,15 @@ public class TaskServiceImpl implements TaskService {
         }
     }
 
+    /**
+     * Выполняет DELETE запрос для удаления задачи по идентификатору.
+     *
+     * @param id уникальный идентификатор задачи
+     * @param url URL запроса
+     * @return ResponseEntity с ответом от API
+     * @throws ResponseStatusException в случае HTTP ошибок при удалении задачи
+     * @throws RuntimeException в случае других неожиданных ошибок
+     */
     private ResponseEntity<Void> exchangeForDelete(String id, String url) {
         try {
             return restTemplateTodoistApi.exchange(url, HttpMethod.DELETE, null, Void.class);

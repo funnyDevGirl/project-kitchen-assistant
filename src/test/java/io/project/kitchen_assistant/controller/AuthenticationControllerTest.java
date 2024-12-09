@@ -45,7 +45,7 @@ public class AuthenticationControllerTest {
 
     private User testUser;
 
-    private final PostgreSQLContainer<?> POSTGRES_CONTAINER =
+    private final PostgreSQLContainer<?> postgresContainer =
             PostgresContainerManager.getContainer();
 
     @BeforeEach

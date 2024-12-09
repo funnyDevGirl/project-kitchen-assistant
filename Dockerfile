@@ -1,9 +1,15 @@
-FROM gradle:8.3.0-jdk20
+FROM gradle:8.10.2-jdk21 AS builder
 
-WORKDIR /
+WORKDIR /app
 
-COPY / .
+COPY . /app
 
-RUN ./gradlew installDist
+RUN gradle clean build -x test
 
-CMD ./build/install/kitchen-assistant/bin/kitchen-assistant
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/kitchen-assistant-0.0.1-SNAPSHOT-plain.jar /app/app.jar
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

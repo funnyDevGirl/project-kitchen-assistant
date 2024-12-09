@@ -22,10 +22,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import java.io.IOException;
 import java.util.List;
 import static io.project.kitchen_assistant.utils.FileReader.readResourceFile;
 import static java.lang.String.format;
 
+/**
+ * Реализация сервиса для работы с рецептами.
+ */
 @Slf4j
 @Service
 public class RecipeServiceImpl implements RecipeService {
@@ -48,6 +52,14 @@ public class RecipeServiceImpl implements RecipeService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Создает новый рецепт и сохраняет его в базе данных.
+     *
+     * @param recipeCreateDTO данные для создания рецепта
+     * @param userEmail       адрес электронной почты пользователя, создавшего рецепт
+     * @return объект RecipeDTO, представляющий созданный рецепт
+     * @throws UsernameNotFoundException если пользователь с указанным адресом электронной почты не найден
+     */
     public RecipeDTO create(RecipeCreateDTO recipeCreateDTO, String userEmail) {
         Recipe recipe = recipeMapper.map(recipeCreateDTO);
 
@@ -61,6 +73,12 @@ public class RecipeServiceImpl implements RecipeService {
         return recipeMapper.map(savedRecipe);
     }
 
+    /**
+     * Получает все рецепты, сохраненные пользователем с указанным адресом электронной почты.
+     *
+     * @param email адрес электронной почты пользователя
+     * @return список объектов RecipeDTO, представляющих рецепты
+     */
     public List<RecipeDTO> getAllRecipesByUserEmail(String email) {
         List<Recipe> recipes = recipeRepository.findAllByUserEmail(email);
         log.info("{} recipes were Received from the DB", recipes.size());
@@ -70,6 +88,13 @@ public class RecipeServiceImpl implements RecipeService {
                 .toList();
     }
 
+    /**
+     * Находит рецепт по его идентификатору.
+     *
+     * @param id идентификатор рецепта
+     * @return объект RecipeDTO, представляющий найденный рецепт
+     * @throws RecipeNotFoundException если рецепт с указанным идентификатором не найден
+     */
     public RecipeDTO findById(long id) {
         var recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException(format("Recipe with id: '%s' not found", id)));
@@ -77,11 +102,23 @@ public class RecipeServiceImpl implements RecipeService {
         return recipeMapper.map(recipe);
     }
 
+    /**
+     * Удаляет рецепт по его идентификатору.
+     *
+     * @param id идентификатор рецепта для удаления
+     */
     public void delete(long id) {
         recipeRepository.deleteById(id);
         log.info("Recipe with id '{}' successfully deleted", id);
     }
 
+    /**
+     * Ищет рецепты по заданному запросу с использованием YandexGPT API.
+     *
+     * @param query запрос для поиска рецептов
+     * @return список объектов RecipeCreateDTO, представляющих найденные рецепты
+     * @throws HttpClientErrorException если происходит ошибка при выполнении запроса к API
+     */
     public List<RecipeCreateDTO> searchRecipes(String query) throws Exception {
 
         String requestBody = createRequestBody(query);
@@ -126,8 +163,20 @@ public class RecipeServiceImpl implements RecipeService {
         return List.of();
     }
 
-    private String createRequestBody(String query) throws Exception {
-        String frameForRequestToGpt = readResourceFile("frameForRequestToGpt.json");
-        return frameForRequestToGpt.replace("%s", query).replace("\"\"", "\"");
+    /**
+     * Создает тело запроса для отправки в API.
+     *
+     * @param query текст запроса
+     * @return строковое представление тела запроса
+     * @throws IOException если происходит ошибка при чтении файла JSON
+     */
+    public String createRequestBody(String query) throws Exception {
+        try {
+            String frameForRequestToGpt = readResourceFile("frameForRequestToGpt.json");
+            return frameForRequestToGpt.replace("%s", query).replace("\"\"", "\"");
+
+        } catch (IOException e) {
+            throw new Exception("Failed to read the request body JSON file", e);
+        }
     }
 }

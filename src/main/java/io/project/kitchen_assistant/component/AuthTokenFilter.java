@@ -34,13 +34,9 @@ import static java.lang.String.format;
  *
  * <p>
  * Фильтр выполняет следующие задачи:
- * <ul>
- *     <li>Извлечение JWT токена из запроса.</li>
- *     <li>Проверка разрешений для доступа к эндпоинтам, таким как
- *         "/api/v1/tasks".</li>
- *     <li>Возврат HTML-ответа при запросе к эндпоинту
- *         "/api/v1/auth/close".</li>
- * </ul>
+ * 1. Извлечение JWT токена из запроса.
+ * 2. Проверка разрешений для доступа к эндпоинтам, таким как "/api/v1/tasks".
+ * 3. Возврат HTML-ответа при запросе к эндпоинту "/api/v1/auth/close".
  * </p>
  *
  * <p>
@@ -130,22 +126,33 @@ public class AuthTokenFilter implements Filter {
     }
 
     /**
+     * Получает входной поток для чтения указанного ресурса из classpath.
+     *
+     * @param fileName имя HTML-файла, который необходимо считать.
+     *
+     * @return входной поток {@code InputStream} для чтения содержимого указанного ресурса,
+     *         или {@code null}, если ресурс не найден.
+     */
+    protected InputStream getResourceAsStream(String fileName) {
+        return getClass().getClassLoader().getResourceAsStream(fileName);
+    }
+
+    /**
      * Считывает HTML-файл из ресурсов приложения.
-     * Вданном случае файл с текстом для появляющегося окна после успешной авторизации в Todoist.
+     * В данном случае файл с текстом для появляющегося окна после успешной авторизации в Todoist.
      *
      * @param fileName имя HTML-файла, который необходимо считать.
      * @return содержимое HTML-файла как {@code String}.
      * @throws IOException если файл не найден или произошла ошибка ввода-вывода.
      */
-    private String readHtmlFile(String fileName) throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+    String readHtmlFile(String fileName) throws IOException {
+        InputStream inputStream = getResourceAsStream(fileName);
 
         if (inputStream == null) {
             throw new IOException("Html file was not found: " + fileName);
         }
 
         StringBuilder htmlBuilder = new StringBuilder();
-
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {

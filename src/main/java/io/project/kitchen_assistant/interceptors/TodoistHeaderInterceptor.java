@@ -16,6 +16,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import static java.lang.String.format;
@@ -73,7 +74,9 @@ public class TodoistHeaderInterceptor implements ClientHttpRequestInterceptor {
         String currentUserEmail = userUtils.getCurrentUserEmail();
         log.debug("Received email: '{}'", currentUserEmail);
 
-        if (request.getURI().toString().contains(appConfig.getTodoistTasksApiUrl())) {
+        URI requestUri = request.getURI();
+
+        if (requestUri != null && requestUri.toString().contains(appConfig.getTodoistTasksApiUrl())) {
 
             User user = userRepository.findByEmail(currentUserEmail).orElseThrow(
                     () -> new UserNotFoundException(format("User with email: '%s' not found", currentUserEmail)));
@@ -82,7 +85,7 @@ public class TodoistHeaderInterceptor implements ClientHttpRequestInterceptor {
 
             setRequestHeaders(request, userToken);
 
-        } else if (request.getURI().toString().equals(appConfig.getExchangeTodoistTokenUri())) {
+        } else if (requestUri != null && requestUri.toString().equals(appConfig.getExchangeTodoistTokenUri())) {
 
             request.getHeaders().setContentType(APPLICATION_FORM_URLENCODED);
 
@@ -108,7 +111,12 @@ public class TodoistHeaderInterceptor implements ClientHttpRequestInterceptor {
             }
         }
 
-        return execution.execute(request, body);
+        try {
+            return execution.execute(request, body);
+        } catch (Exception e) {
+            log.error("Error occurred during request execution: {}", e.getMessage());
+            throw new IOException("Error executing request", e);
+        }
     }
 
     /**

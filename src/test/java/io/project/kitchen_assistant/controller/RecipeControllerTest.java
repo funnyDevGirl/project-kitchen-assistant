@@ -70,7 +70,7 @@ public class RecipeControllerTest {
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
-    private final PostgreSQLContainer<?> POSTGRES_CONTAINER =
+    private final PostgreSQLContainer<?> postgresContainer =
             PostgresContainerManager.getContainer();
 
     @BeforeEach

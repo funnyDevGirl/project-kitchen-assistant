@@ -19,28 +19,38 @@ import static org.mockito.Mockito.when;
 public class UserUtilsTest {
 
     private UserUtils userUtils;
+
     private UserRepository mockUserRepository;
+
+    private String userEmail;
+
+    private long userId;
+
+    private User user;
 
     @BeforeEach
     public void setUp() {
         mockUserRepository = Mockito.mock(UserRepository.class);
         userUtils = new UserUtils(mockUserRepository);
+
+        userEmail = "test@example.com";
+        userId = 1L;
+
+        user = new User();
+        user.setEmail(userEmail);
     }
 
     @Test
     public void testGetCurrentUserEmailWhenAuthenticated() {
-        // Arrange
-        String expectedEmail = "test@example.com";
-
         // Mock Authentication object
-        Authentication mockAuthentication = new UsernamePasswordAuthenticationToken(expectedEmail, null, List.of());
+        Authentication mockAuthentication = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
         SecurityContextHolder.getContext().setAuthentication(mockAuthentication);
 
         // Act
         String actualEmail = userUtils.getCurrentUserEmail();
 
         // Assert
-        assertEquals(expectedEmail, actualEmail);
+        assertEquals(userEmail, actualEmail);
     }
 
     @Test
@@ -57,13 +67,6 @@ public class UserUtilsTest {
 
     @Test
     public void testIsUserWhenUserIsAuthenticated() {
-        // Arrange
-        long userId = 1L;
-        String userEmail = "test@example.com";
-
-        User user = new User();
-        user.setEmail(userEmail);
-
         // Mock User
         when(mockUserRepository.findById(userId)).thenReturn(Optional.of(user));
 
@@ -80,13 +83,6 @@ public class UserUtilsTest {
 
     @Test
     public void testIsUserWhenUserIsNotAuthenticated() {
-        // Arrange
-        long userId = 1L;
-        String userEmail = "test@example.com";
-
-        User user = new User();
-        user.setEmail(userEmail);
-
         when(mockUserRepository.findById(userId)).thenReturn(Optional.of(user));
         SecurityContextHolder.clearContext();
 
@@ -99,13 +95,6 @@ public class UserUtilsTest {
 
     @Test
     public void testIsUserWhenUserDoesNotMatch() {
-        // Arrange
-        long userId = 1L;
-        String userEmail = "test@example.com";
-
-        User user = new User();
-        user.setEmail(userEmail);
-
         when(mockUserRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Mock Authentication

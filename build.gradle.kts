@@ -80,12 +80,8 @@ dependencies {
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0")
 	implementation("javax.validation:validation-api:1.0.0.GA")
 	testImplementation("io.github.hakky54:logcaptor:2.10.0")
-
-	testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
-	implementation("org.wiremock.integrations.testcontainers:wiremock-testcontainers-module:1.0-alpha-13")
-	implementation("org.springframework.cloud:spring-cloud-contract-wiremock:4.1.4")
+	implementation("org.apache.commons:commons-lang3:3.17.0")
 }
-
 
 tasks.withType<Test>() {
 	systemProperty("file.encoding", "utf-8")
@@ -105,5 +101,15 @@ tasks.withType<JavaCompile> {
 tasks.jacocoTestReport {
 	reports {
 		xml.required.set(true)
+		html.required.set(true)
 	}
+	classDirectories.setFrom(
+		sourceSets.main.get().output.asFileTree.matching {
+			exclude("io/project/kitchen_assistant/dto/**")
+			exclude("io/project/kitchen_assistant/model/**")
+			exclude("io/project/kitchen_assistant/config/**")
+			exclude("io/project/kitchen_assistant/exception/**")
+			exclude("**/Application.*")
+		}
+	)
 }

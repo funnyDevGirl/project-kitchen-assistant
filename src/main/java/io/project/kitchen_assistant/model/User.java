@@ -22,6 +22,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+/**
+ * Класс, представляющий пользователя.
+ * <p>
+ * Этот класс используется для хранения информации о пользователях,
+ * включая имя, фамилию, адрес электронной почты, хеш пароля,
+ * время создания учетной записи и дополнительный токен для интеграции с Todoist.
+ * Также реализует интерфейс {@link UserDetails} для использования в системе аутентификации Spring Security.
+ * </p>
+ */
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
@@ -30,27 +39,51 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @EqualsAndHashCode(of = "email")
 public class User implements UserDetails {
 
+    /**
+     * Уникальный идентификатор пользователя.
+     * Создается автоматически в базе данных.
+     */
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    /**
+     * Имя пользователя.
+     */
     private String firstName;
 
+    /**
+     * Фамилия пользователя.
+     */
     private String lastName;
 
+    /**
+     * Адрес электронной почты пользователя.
+     * Должен соответствовать формату электронной почты и должен быть уникальным в базе данных.
+     */
     @Email
     @Column(unique = true)
     private String email;
 
+    /**
+     * Хеш пароля пользователя.
+     * Должен иметь минимальную длину в 3 символа и не может быть пустым.
+     */
     @Size(min = 3)
     @NotBlank
     @JsonIgnore
     private String passwordDigest;
 
+    /**
+     * Дата и время создания учетной записи пользователя.
+     */
     @CreatedDate
     @Column(name = "created_at")
     private LocalDate createdAt;
 
+    /**
+     * Токен для интеграции с Todoist.
+     */
     private String todoistToken;
 
 

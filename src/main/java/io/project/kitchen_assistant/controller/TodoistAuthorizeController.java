@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ import java.net.URI;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/auth")
+@Validated
 public class TodoistAuthorizeController {
 
     private final JWTUtils jwtUtils;
@@ -51,7 +53,6 @@ public class TodoistAuthorizeController {
 
         return new RedirectView(authorizationUrl);
     }
-
 
     /**
      * Обрабатывает обратный вызов после успешной аутентификации пользователя в сервисе Todoist.
@@ -103,7 +104,6 @@ public class TodoistAuthorizeController {
                 .build();
     }
 
-
     /**
      * Закрывает текущее окно на стороне клиента.
      *
@@ -120,7 +120,7 @@ public class TodoistAuthorizeController {
     public void closeTab() {
     }
 
-    private String getUserEmail(Authentication authentication) {
+    protected String getUserEmail(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
 

@@ -21,7 +21,9 @@ import static org.mockito.Mockito.when;
 public class JWTUtilsTest {
 
     private JWTUtils jwtUtils;
+
     private JwtEncoder mockEncoder;
+
     private JwtDecoder mockDecoder;
 
     @BeforeEach
