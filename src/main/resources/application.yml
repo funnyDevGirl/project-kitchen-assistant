@@ -55,3 +55,9 @@ gpt-api-url: "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
 
 # данные для создания задач в Todoist:
 todoist-tasks-api-url: "https://api.todoist.com/rest/v2/tasks"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs

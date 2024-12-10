@@ -12,4 +12,6 @@ WORKDIR /app
 
 COPY --from=builder /app/build/libs/kitchen-assistant-0.0.1-SNAPSHOT-plain.jar /app/app.jar
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENV SPRING_PROFILES_ACTIVE=prod
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar", ]
