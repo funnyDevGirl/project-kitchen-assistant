@@ -8,5 +8,5 @@ ENV SPRING_PROFILES_ACTIVE=prod
 
 RUN ./gradlew installDist
 
-CMD ./build/install/app/bin/app
+CMD ./build/install/kitchen-assistant/bin/kitchen-assistant
 
