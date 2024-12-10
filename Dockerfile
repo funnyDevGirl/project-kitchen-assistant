@@ -1,15 +1,12 @@
-FROM gradle:8.10.2-jdk21 AS builder
+FROM gradle:8.6.0-jdk21
 
-WORKDIR /app
+WORKDIR /
 
-COPY . /app
+COPY / .
 
-RUN gradle clean build -x test
+ENV SPRING_PROFILES_ACTIVE=prod
 
-FROM eclipse-temurin:21-jre-alpine
+RUN ./gradlew installDist
 
-WORKDIR /app
+CMD ./build/install/app/bin/app
 
-COPY --from=builder /app/build/libs/kitchen-assistant-0.0.1-SNAPSHOT-plain.jar /app/app.jar
-
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]

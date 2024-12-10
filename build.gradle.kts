@@ -81,6 +81,9 @@ dependencies {
 	implementation("javax.validation:validation-api:1.0.0.GA")
 	testImplementation("io.github.hakky54:logcaptor:2.10.0")
 	implementation("org.apache.commons:commons-lang3:3.17.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
+	testImplementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
 }
 
 tasks.withType<Test>() {

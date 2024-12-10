@@ -115,7 +115,7 @@ public class TaskServiceImplTest {
                 eq(TodoistTaskResponse.class)))
                 .thenReturn(ResponseEntity.badRequest().build());
 
-        // Act и Assert
+        // Act, Assert
         assertThrows(IllegalArgumentException.class, () -> taskServiceImpl.create(taskRequest));
     }
 
@@ -130,7 +130,7 @@ public class TaskServiceImplTest {
                 eq(TodoistTaskResponse.class)))
                 .thenReturn(ResponseEntity.ok().body(null));
 
-        // Act и Assert
+        // Act, Assert
         assertThrows(IllegalArgumentException.class, () -> taskServiceImpl.create(taskRequest));
     }
 
@@ -145,7 +145,7 @@ public class TaskServiceImplTest {
                 eq(TodoistTaskResponse.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-        // Act и Assert
+        // Act, Assert
         assertThrows(ResponseStatusException.class, () -> taskServiceImpl.create(taskRequest));
     }
 
@@ -160,7 +160,7 @@ public class TaskServiceImplTest {
                 eq(TodoistTaskResponse.class)))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
-        // Act и Assert
+        // Act, Assert
         assertThrows(RuntimeException.class, () -> taskServiceImpl.create(taskRequest));
     }
 
@@ -205,7 +205,7 @@ public class TaskServiceImplTest {
                 eq(TodoistTaskResponse.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        // Act и Assert
+        // Act, Assert
         TaskNotFoundException exception = assertThrows(TaskNotFoundException.class,
                 () -> taskServiceImpl.getById(taskId));
 
@@ -221,7 +221,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.GET), isNull(), eq(TodoistTaskResponse.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-        // Act и Assert
+        // Act, Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> taskServiceImpl.getById(taskId));
 
@@ -238,7 +238,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.GET), isNull(), eq(TodoistTaskResponse.class)))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
-        // Act и Assert
+        // Act, Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> taskServiceImpl.getById(taskId));
 
@@ -260,7 +260,7 @@ public class TaskServiceImplTest {
                 .thenThrow(new HttpClientErrorException(
                         HttpStatus.INTERNAL_SERVER_ERROR, "Some internal server error"));
 
-        // Act & Assert
+        // Act, Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
             taskServiceImpl.getById(taskId));
 
@@ -339,7 +339,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.GET), isNull(), eq(TodoistTaskResponse[].class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-        // Act и Assert
+        // Act, Assert
         assertThrows(ResponseStatusException.class,
                 () -> taskServiceImpl.getAll());
     }
@@ -350,7 +350,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.GET), isNull(), eq(TodoistTaskResponse[].class)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
-        // Act и Assert
+        // Act, Assert
         assertThrows(ResponseStatusException.class,
                 () -> taskServiceImpl.getAll());
     }
@@ -361,7 +361,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.GET), isNull(), eq(TodoistTaskResponse[].class)))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
-        // Act и Assert
+        // Act, Assert
         assertThrows(RuntimeException.class,
                 () -> taskServiceImpl.getAll());
     }
@@ -374,8 +374,6 @@ public class TaskServiceImplTest {
         when(restTemplateTodoistApi.exchange(eq(url),
                 eq(HttpMethod.DELETE), isNull(), eq(Void.class)))
                 .thenReturn(ResponseEntity.ok().build());
-
-//        LogCaptor logCaptor = LogCaptor.forClass(TaskServiceImpl.class);
 
         // Act
         taskServiceImpl.delete(id);
@@ -393,7 +391,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.DELETE), isNull(), eq(Void.class)))
                 .thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 
-        // Act и Assert
+        // AAct, Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> taskServiceImpl.delete(id));
 
@@ -410,7 +408,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.DELETE), isNull(), eq(Void.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-        // Act и Assert
+        // Act, Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> taskServiceImpl.delete(id));
 
@@ -428,7 +426,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.DELETE), isNull(), eq(Void.class)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
-        // Act и Assert
+        // Act, Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> taskServiceImpl.delete(id));
 
@@ -446,7 +444,7 @@ public class TaskServiceImplTest {
                 eq(HttpMethod.DELETE), isNull(), eq(Void.class)))
                 .thenThrow(new RuntimeException("Unexpected error occurred while deleting task"));
 
-        // Act и Assert
+        // Act, Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> taskServiceImpl.delete(id));
 
