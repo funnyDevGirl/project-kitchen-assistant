@@ -77,6 +77,13 @@ jobs:
 
       - name: Test with Gradle
         uses: gradle/gradle-build-action@v2
+        env:
+          GPT_JWT_TOKEN: ${{secrets.GPT_JWT_TOKEN}}
+          GPT_FOLDER_ID: ${{secrets.GPT_FOLDER_ID}}
+          PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
+          PUBLIC_KEY: ${{secrets.PUBLIC_KEY}}
+          TODOIST_CLIENT_ID: ${{secrets.TODOIST_CLIENT_ID}}
+          TODOIST_CLIENT_SECRET: ${{secrets.TODOIST_CLIENT_SECRET}}
         with:
           gradle-version: 8.7
           arguments: build
