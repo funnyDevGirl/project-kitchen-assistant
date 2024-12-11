@@ -1,28 +1,6 @@
 ---
 
 spring:
-  jpa:
-    generate-ddl: true
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
-
-  http:
-    encoding:
-      enabled: true
-      charset: UTF-8
-      force: true
-
-  output:
-    ansi:
-      enabled: always
-
-  sql:
-    init:
-      mode: always
-  profiles:
-    default: dev
-
   security:
     oauth2:
       client:
@@ -38,9 +16,14 @@ spring:
             authorization-uri: https://todoist.com/oauth/authorize
             token-uri: https://todoist.com/oauth/access_token
 
-logging:
-  level:
-    root: INFO
+
+
+  datasource:
+    url: jdbc:tc:postgresql://localhost/test_db
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
 
 rsa:
   private-key: ${PRIVATE_KEY}
