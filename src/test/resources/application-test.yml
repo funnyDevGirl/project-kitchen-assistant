@@ -17,14 +17,6 @@ spring:
             token-uri: https://todoist.com/oauth/access_token
 
 
-
-  datasource:
-    url: jdbc:tc:postgresql://localhost/test_db
-    username: test
-    password: test
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-
-
 rsa:
   private-key: ${PRIVATE_KEY}
   public-key: ${PUBLIC_KEY}
