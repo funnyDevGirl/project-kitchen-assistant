@@ -4,11 +4,8 @@ build:
 install:
 	./gradlew installDist
 
-test:
-	./gradlew test
-
-report:
-	./gradlew jacocoTestReport
+test-report:
+	./gradlew test jacocoTestReport
 
 run:
 	./gradlew bootRun

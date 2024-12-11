@@ -83,7 +83,6 @@ jobs:
 
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v5.0.0
-        run: ./gradlew test jacocoTestReport
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
           JACOCO_SOURCE_PATH: src/main/java
@@ -94,5 +93,5 @@ jobs:
           TODOIST_CLIENT_ID: ${{secrets.TODOIST_CLIENT_ID}}
           TODOIST_CLIENT_SECRET: ${{secrets.TODOIST_CLIENT_SECRET}}
         with:
-          coverageCommand: make report
+          coverageCommand: make test-report
           coverageLocations: ${{github.workspace}}/build/reports/jacoco/test/jacocoTestReport.xml:jacoco

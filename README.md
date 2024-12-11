@@ -1,3 +1,6 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/3aec33f8c07b3cea714f/maintainability)](https://codeclimate.com/github/funnyDevGirl/project-kitchen-assistant/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/3aec33f8c07b3cea714f/test_coverage)](https://codeclimate.com/github/funnyDevGirl/project-kitchen-assistant/test_coverage)
+
 # Kitchen Assistant App
 <img src="images/kitchen-assistant-app-icon.png" alt="Recipe Search" width="70"/>
 
