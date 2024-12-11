@@ -8,3 +8,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          todoist:
+            redirect-uri: https://kitchen-assistant-app.onrender.com/api/v1/auth/callback
