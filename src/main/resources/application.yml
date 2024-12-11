@@ -31,7 +31,6 @@ spring:
             client-secret: ${TODOIST_CLIENT_SECRET}
             authorization-grant-type: authorization_code
             scope: data:read_write,data:delete
-            redirect-uri: https://localhost:8080/api/v1/auth/callback
         provider:
           todoist:
             authorization-uri: https://todoist.com/oauth/authorize
