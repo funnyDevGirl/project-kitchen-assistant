@@ -4,8 +4,6 @@ WORKDIR /
 
 COPY / .
 
-ENV SPRING_PROFILES_ACTIVE=prod
-
 RUN ./gradlew installDist
 
 CMD ./build/install/kitchen-assistant/bin/kitchen-assistant

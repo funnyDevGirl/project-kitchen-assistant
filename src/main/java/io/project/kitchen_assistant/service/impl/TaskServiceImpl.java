@@ -61,7 +61,7 @@ public class TaskServiceImpl implements TaskService {
                 .map(taskMapper::toDTO)
                 .map(task -> {
                     log.info("The response from Todoist to create the task: '{}'", responseEntity.getBody());
-                    log.info("Task with content '{}' has been created on Todoist. Here is the response: '{}'",
+                    log.debug("Task with content '{}' has been created on Todoist. Here is the response: '{}'",
                             taskRequest.getContent(), task);
                     return task;
                 })
