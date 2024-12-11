@@ -127,7 +127,8 @@ public class RecipeControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(format("Recipe with id: '%s' not found", nonExistentId)));
+                .andExpect(content().string(format("{\"code\":404,\"message\":\"Recipe with id: '%s' not found\"}",
+                        nonExistentId)));
     }
 
     @Test

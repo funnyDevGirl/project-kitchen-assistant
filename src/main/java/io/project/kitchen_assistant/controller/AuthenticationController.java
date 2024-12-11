@@ -28,28 +28,23 @@ public class AuthenticationController {
     private final JWTUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
 
-    @Operation(
-            summary = "User login to the application",
-            description = "Performs user login to the system"
+    @Operation(summary = "User login to the application", description = "Performs user login to the system."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful authorization",
-                    content = @Content(
-                            mediaType = "application/json",
+                    content = @Content(mediaType = "application/json",
                             schema = @Schema(type = "string",
                                     description = "JWT token for user authentication",
                                     example = "Rvkj37yLKNgb349nlj"))
             ),
             @ApiResponse(responseCode = "400", description = "Incorrect username or password",
-                    content = @Content(
-                            mediaType = "application/json",
+                    content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {@ExampleObject(value = "{\"code\": \"400\", \"message\": "
                                     + "\"Incorrect username or password\"}")})
             ),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                    content = @Content(
-                            mediaType = "application/json",
+                    content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {@ExampleObject(value = "{\"code\": \"500\", \"message\": "
                                     + "\"Internal Server Error\"}")}))
