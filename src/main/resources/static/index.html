@@ -79,10 +79,18 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Тень текста */
         }
 
+        .no-border-message {
+            margin: 10px; /* Отступ */
+            font-size: 16px; /* Размер шрифта */
+            color: #333; /* Цвет текста */
+            background: none; /* Удаление фона */
+            padding: 0; /* Удаление отступов */
+        }
+
     </style>
 </head>
 <body>
-<!-- Навигационный блок -->
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar" style="display: none;">
     <a class="navbar-brand" href="/">Kitchen Assistant</a>
     <a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
@@ -143,14 +151,13 @@
 
     <div id="searchContainer" style="display: none;">
 
-
         <h5>Приступим к поиску рецепта!</h5>
 
         <div class="input-group mb-3">
             <input type="text" id="searchQuery" class="form-control" placeholder="Введите ингредиенты..." aria-label="Запрос" aria-describedby="button-search">
             <div class="input-group-append">
                 <button class="btn btn-primary" id="searchBtn" type="button">Поиск</button>
-                <div class="invalid-feedback">Пожалуйста, введите запрос для поиска.</div> <!-- Сообщение об ошибке -->
+                <div class="invalid-feedback">Пожалуйста, введите запрос для поиска.</div>
             </div>
         </div>
     </div>
@@ -158,14 +165,13 @@
 
 <div class="container mt-5" id="results"></div>
 
-<!-- Модальное окно для алертов -->
 <div class="modal" id="alertModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <div class="modal-content text-center"> <!-- Центрируем текст внутри -->
+        <div class="modal-content text-center">
             <div class="modal-body">
                 <p id="alertMessage">Сообщение по умолчанию</p>
             </div>
-            <div class="modal-footer justify-content-center"> <!-- Выравнивание по центру -->
+            <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
             </div>
         </div>
@@ -175,24 +181,24 @@
 <script>
     $(document).ready(function() {
 
-        // Проверяем, авторизован ли пользователь при загрузке страницы
+        // Проверяю, авторизован ли пользователь при загрузке страницы
         const token = localStorage.getItem('jwt-token');
         const username = localStorage.getItem('username');
 
         if (token) {
-            $("#navbar").show(); // Показать навигационный блок
-            $('.bg-dark.text-white').show(); // Показываем слоган
+            $("#navbar").show();
+            $('.bg-dark.text-white').show();
 
-            // Обновляем текст на кнопке "Личный кабинет"
+            // Обновляю текст на кнопке "Личный кабинет"
             $("#profileBtn").text(`${username}`);
 
-            $("#loginContainer").hide(); // Скрыть форму логина
-            $("#searchContainer").show(); // Показать строку поиска
+            $("#loginContainer").hide();
+            $("#searchContainer").show();
         } else {
-            $("#loginContainer").show(); // Показать форму логина
-            $("#navbar").hide(); // Скрыть навигационный блок
-            $("#searchContainer").hide(); // Скрыть строку поиска
-            $('.bg-dark.text-white').hide(); // Показываем слоган
+            $("#loginContainer").show();
+            $("#navbar").hide();
+            $("#searchContainer").hide();
+            $('.bg-dark.text-white').hide();
         }
 
         // Обработка формы входа
@@ -210,33 +216,33 @@
                 success: function(token) {
                     localStorage.setItem('jwt-token', token);
 
-                    // Теперь сделаем запрос для получения информации о пользователе
+                    // Запрос для получения информации о пользователе
                     $.ajax({
-                        url: '/api/v1/users/current', // Убедитесь, что здесь правильный URL для получения информации о пользователе
+                        url: '/api/v1/users/current',
                         type: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}` // Передаем токен в заголовках
+                            'Authorization': `Bearer ${token}`
                         },
                         success: function(userInfo) {
-                            const firstName = userInfo.firstName; // Предполагается, что ваш API возвращает имя пользователя
-                            const userId = userInfo.id; // ID пользователя
+                            const firstName = userInfo.firstName;
+                            const userId = userInfo.id;
 
                             console.log('Текущее значение ID: ' + userId);
 
-                            localStorage.setItem('username', firstName); // Сохраняем firstName в localStorage
-                            localStorage.setItem('userId', userId); // Сохраняем userId в localStorage
+                            localStorage.setItem('username', firstName);
+                            localStorage.setItem('userId', userId);
 
                             $("#message").text('Успешный вход!');
 
                             // Обновление интерфейса
-                            $("#navbar").show(); // Показать навигационный блок
-                            $('.bg-dark.text-white').show(); // Показываем слоган
+                            $("#navbar").show();
+                            $('.bg-dark.text-white').show();
 
-                            $("#loginContainer").hide(); // Скрыть форму логина
-                            $("#searchContainer").show(); // Показать строку поиска
+                            $("#loginContainer").hide();
+                            $("#searchContainer").show();
 
-                            // Обновляем текст на кнопке "Личный кабинет" с использованием firstName
-                            $("#profileBtn").text(firstName); // Установите текст на кнопке
+                            // Обновляею текст на кнопке "Личный кабинет"
+                            $("#profileBtn").text(firstName); // Ставлю текст на кнопке
                         },
                         error: function(xhr, status, error) {
                             $("#message").text('Не удалось получить информацию о пользователе: ' + error);
@@ -245,7 +251,6 @@
                 },
                 error: function(xhr, status, error) {
 
-                    // Отобразить модальное окно с сообщением
                     $("#alertMessage").text("Неудачная попытка входа. Попробуйте ещё раз!");
                     $("#alertModal").modal('show');
                 }
@@ -262,14 +267,15 @@
             const password = $("#regPassword").val();
 
             $.ajax({
-                url: '/api/v1/users', // URL для регистрации
+                url: '/api/v1/users',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ firstName, lastName, email, password }),
                 success: function() {
+
                     $("#regMessage").text('Регистрация прошла успешно! Теперь вы можете войти в систему.');
-                    $("#registerContainer").hide(); // Скрыть форму регистрации
-                    $("#loginContainer").show(); // Показать форму логина
+                    $("#registerContainer").hide();
+                    $("#loginContainer").show();
                 },
                 error: function(xhr, status, error) {
                     console.error("Ошибка регистрации: " + error);
@@ -280,20 +286,20 @@
 
         // Показать форму регистрации
         $("#showRegister").on("click", function() {
-            $("#loginContainer").hide(); // Скрыть форму логина
-            $("#registerContainer").show(); // Показать форму регистрации
+            $("#loginContainer").hide();
+            $("#registerContainer").show();
         });
 
         // Показать форму входа
         $("#showLogin").on("click", function() {
-            $("#registerContainer").hide(); // Скрыть форму регистрации
-            $("#loginContainer").show(); // Показать форму логина
+            $("#registerContainer").hide();
+            $("#loginContainer").show();
         });
 
         // Обработка поиска
         $("#searchBtn").on("click", function() {
-            $("#navbar").show(); // Показать навигационный блок
-            $('.bg-dark.text-white').show(); // Показываем слоган
+            $("#navbar").show();
+            $('.bg-dark.text-white').show();
 
             const query = $("#searchQuery").val();
 
@@ -306,20 +312,22 @@
             // Убрать класс ошибки, если есть введенные данные
             $("#searchQuery").removeClass("is-invalid");
 
+            $("#results").html('<div class="no-border-message">Идет поиск лучших рецептов для Вас...</div>');
+
             $.ajax({
                 url: '/api/v1/recipes/search',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(query),
                 success: function(recipes) {
-                    $("#results").empty(); // очищаем результаты перед новым поиском
+                    $("#results").empty(); // очищаю результаты перед новым поиском
 
-                    console.log("Received recipes:", recipes); // Проверка полученных данных
+                    console.log("Received recipes:", recipes);
 
                     if (recipes.length > 0) {
                         recipes.forEach(function(recipe) {
 
-                            console.log("Recipe details:", recipe); // Проверка детализации каждого рецепта
+                            console.log("Recipe details:", recipe);
 
                             let recipeHtml = `
                             <div class="card mb-4 recipe-item">
@@ -347,7 +355,7 @@
                             url: '/api/v1/recipes',
                             type: 'POST',
                             headers: {
-                                'Authorization': `Bearer ${token}` // Передаем токен в заголовках
+                                'Authorization': `Bearer ${token}`
                             },
                             contentType: 'application/json',
                             data: JSON.stringify({
@@ -356,13 +364,13 @@
                                 instructions: recipe.instructions
                             }),
                             success: function(response) {
-                                const recipeId = response.id; // Предполагаем, что response содержит id
-                                console.log("Saved recipe's id: ", recipeId); // Проверка, что id создался
+                                const recipeId = response.id;
+                                console.log("Saved recipe's id: ", recipeId);
 
-                                localStorage.setItem('lastSavedRecipeId', recipeId); // Сохраняем recipe id в localStorage
+                                localStorage.setItem('lastSavedRecipeId', recipeId);
 
                                 // Изменение текста и цвета кнопки
-                                const button = $(this); // Ссылка на текущую кнопку
+                                const button = $(this);
                                 button.text("Сохранено в Избранные рецепты").css("background-color", "green").attr("disabled", true); // Устанавливаем текст, цвет и отключаем кнопку
 
                             }.bind(this), // Привязка контекста для использования $(this) внутри success
@@ -370,7 +378,6 @@
                             error: function(xhr, status, error) {
                                 console.error("Ошибка при сохранении рецепта: " + error);
 
-                                // Отобразить модальное окно с сообщением
                                 $("#alertMessage").text("Произошла ошибка при сохранении рецепта.");
                                 $("#alertModal").modal('show');
                             }
@@ -387,7 +394,7 @@
         // Обработка перехода в личный кабинет
         $("#profileBtn").click(function() {
             const userId = localStorage.getItem('userId');
-            window.location.href = `/account.html`; // Переход на страницу профиля
+            window.location.href = `/account.html`;
         });
 
         // Обработка выхода
@@ -396,12 +403,12 @@
             localStorage.removeItem('userId');
             localStorage.removeItem('username');
 
-            $("#navbar").hide(); // Скрыть навигационный блок
-            $('.bg-dark.text-white').hide(); // Показываем слоган
-            $("#loginContainer").show(); // Показать форму логина
-            $("#searchContainer").hide(); // Скрыть строку поиска
-            $("#results").hide(); // Скрыть результаты поиска
-            window.location.href = '/'; // Переход на главную страницу
+            $("#navbar").hide();
+            $('.bg-dark.text-white').hide();
+            $("#loginContainer").show();
+            $("#searchContainer").hide();
+            $("#results").hide();
+            window.location.href = '/';
         });
     });
 </script>

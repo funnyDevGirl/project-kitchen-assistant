@@ -45,7 +45,7 @@
 
 </head>
 <body>
-<!-- Навигационный блок -->
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
 <a class="navbar-brand" href="/">Kitchen Assistant</a>
 <a id="mainPage" class="nav-link ml-2" href="/">Главная страница</a>
@@ -59,7 +59,6 @@
   <span class="slogan">Находите рецепты за секунды – готовьте с удовольствием!</span>
 </div>
 
-
 <div class="container mt-5">
   <h4 id="greeting">Привет, <span id="userFirstName"></span>!</h4>
   <div class="mt-4">
@@ -68,7 +67,6 @@
   </div>
 </div>
 
-<!-- Модальное окно для редактирования профиля -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -106,6 +104,19 @@
   </div>
 </div>
 
+<div class="modal" id="alertModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content text-center">
+      <div class="modal-body">
+        <p id="alertMessage">Сообщение по умолчанию</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-sm" onclick="window.open('https://todoist.com', '_blank')">Перейти в Todoist</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 $(document).ready(function() {
@@ -115,14 +126,14 @@ $(document).ready(function() {
     const userId = localStorage.getItem('userId');
 
     if (!token && !username) { // вместо ||
-        window.location.href = "/"; // Перенаправить на страницу входа
+        window.location.href = "/";
         return;
     }
 
-    // Заполняем имя пользователя из localStorage
+    // Заполняю имя пользователя из localStorage
     $("#userFirstName").text(username);
 
-    // Исправляем заголовки для авторизации
+    // Ставлю заголовки для авторизации
     const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -131,13 +142,12 @@ $(document).ready(function() {
     // Открытие модального окна для редактирования профиля
     $("#editProfileBtn").click(function() {
 
-        // Считываем текущие данные пользователя
+        // Считываю текущие данные пользователя
         $.get(`/api/v1/users/${userId}`, { headers: headers }, function(data) {
             $("#email").val(data.email);
             $("#firstName").val(data.firstName);
             $("#lastName").val(data.lastName);
-            // Установка текущего пароля не рекомендуется по соображениям безопасности; пользователю нужно будет ввести пароль заново.
-            $("#editProfileModal").modal('show'); // Показываем модальное окно
+            $("#editProfileModal").modal('show');
         });
     });
 
@@ -156,53 +166,48 @@ $(document).ready(function() {
             headers: headers,
             data: JSON.stringify(userUpdateData),
             success: function(response) {
-                alert("Профиль успешно обновлен!");
-                $("#editProfileModal").modal('hide'); // Закрываем модальное окно
+
+                $("#editProfileModal").modal('hide');
 
                 // Обновление имени в localStorage
                 localStorage.setItem('username', userUpdateData.firstName);
-                $("#userFirstName").text(userUpdateData.firstName); // Обновляем отображение имени на экране
+                $("#userFirstName").text(userUpdateData.firstName); // Обновляю отображение имени на экране
 
             },
             error: function(xhr) {
-                alert("Ошибка при обновлении профиля: " + xhr.responseText);
+                console.error("Ошибка при обновлении профиля: " + xhr.responseText + error);
             }
         });
     });
 
     // Обработка события на кнопке "Удалить профиль"
     $("#deleteProfileBtn").click(function(e) {
-        e.preventDefault(); // Предотвращаем переход по ссылке
+        e.preventDefault(); // Предотвращаю переход по ссылке
 
-        if (confirm("Вы уверены, что хотите удалить свой профиль? Это действие необратимо.")) {
-            $.ajax({
-                url: `/api/v1/users/${userId}`,
-                type: 'DELETE',
-                headers: headers,
-                success: function() {
-                    alert("Профиль успешно удалён!");
-                    // Перенаправление на главную страницу или выполнение другой логики
+        $.ajax({
+            url: `/api/v1/users/${userId}`,
+            type: 'DELETE',
+            headers: headers,
+            success: function() {
 
-                    localStorage.removeItem('jwt-token');
-                    localStorage.removeItem('userId');
-                    localStorage.removeItem('username');
+                localStorage.removeItem('jwt-token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
 
-                    window.location.href = '/';
-                },
-                error: function(xhr) {
-                    alert("Ошибка при удалении профиля: " + xhr.responseText);
-                }
-            });
-        }
+                window.location.href = '/';
+            },
+            error: function(xhr) {
+                console.error("Ошибка при удалении профиля: " + xhr.responseText + error);
+            }
+        });
     });
-
 
   // Обработка выхода
   $("#logoutBtn").click(function() {
       localStorage.removeItem('jwt-token');
       localStorage.removeItem('userId');
       localStorage.removeItem('username');
-      window.location.href = '/'; // Переход на главную страницу
+      window.location.href = '/';
   });
 });
 </script>
