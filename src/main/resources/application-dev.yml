@@ -7,3 +7,11 @@ spring:
   h2:
     console:
       enabled: true
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          todoist:
+            redirect-uri: https://localhost:8080/api/v1/auth/callback
